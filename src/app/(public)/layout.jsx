@@ -1,32 +1,20 @@
 'use client'
-// src/app/(public)/layout.jsx
-import {ShadcnNavBar} from "@/Componentes/shadcnNavBar";
-import CarritoProvider from "@/ContextosGlobales/CarritoContext";
+
+import { ShadcnNavBar } from "@/Componentes/shadcnNavBar";
+import FooterPremiumMedico from "@/Componentes/Footer";
 import ToasterClient from "@/Componentes/ToasterClient";
-import ObjetoPagarProvider from "@/ContextosGlobales/ObjetoPagarContext";
-import FloatingWhatsApp from "@/Componentes/FloatingWhatsApp";
-import FooterSiluetaChic from "@/Componentes/Footer";
-
-
 
 export default function PublicLayout({ children }) {
-    return (
-        <ObjetoPagarProvider>
-            <CarritoProvider>
-                <div className="relative">
-                    <ToasterClient />
-                    <nav className="sticky top-0 z-50">
-                        <ShadcnNavBar />
-                    </nav>
-                    <main className="relative z-0">{children}</main>
-
-                    <FloatingWhatsApp/>
-                    <br/><br/><br/><br/>
-
-                    <FooterSiluetaChic/>
-
-                </div>
-            </CarritoProvider>
-        </ObjetoPagarProvider>
-    )
+  return (
+    <div className="relative z-0 mt-0 min-h-screen bg-[#f6f7fb]">
+      <ToasterClient />
+      <nav className="fixed inset-x-0 top-0 z-50">
+        <ShadcnNavBar />
+      </nav>
+      <main className="relative z-0 pt-[86px] md:pt-[94px]">{children}</main>
+      <div className="mt-0">
+        <FooterPremiumMedico />
+      </div>
+    </div>
+  );
 }

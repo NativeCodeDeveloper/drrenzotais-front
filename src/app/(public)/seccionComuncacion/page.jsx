@@ -1,7 +1,7 @@
 'use client'
 import CarruselOfertas from "@/Componentes/CarruselOfertas";
 import Link from "next/link";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 
 export default function SeccionComuncacion() {
@@ -12,22 +12,22 @@ export default function SeccionComuncacion() {
         try {
             const res = await fetch(`${API}/publicaciones/seleccionarPublicaciones`, {
                 method: "GET",
-                headers: {Accept: "application/json"},
+                headers: { Accept: "application/json" },
                 mode: "cors",
                 cache: "no-cache"
             })
 
-            if(!res.ok) {
+            if (!res.ok) {
                 console.error("No se han podido Listar Publicaciones / Falla en el fetch desde el frontEnd");
                 setListaPublicaciones([])
-                return[]
-            }else {
+                return []
+            } else {
                 const publicaciones = await res.json();
                 setListaPublicaciones(publicaciones);
                 return publicaciones;
             }
-        }catch(err) {
-            console.error("Problema al consultar Backen desde la vista fronend:"+err);
+        } catch (err) {
+            console.error("Problema al consultar Backen desde la vista fronend:" + err);
         }
     }
 
@@ -52,30 +52,30 @@ export default function SeccionComuncacion() {
     )
 
     return (
-       <div>
-           {/* PANTALLAS ESCRITORIO*/}
-           <div className="hidden md:block">
-               <section className="mt-50 px-6">
-                   <div className="max-w-7xl mx-auto text-center">
-                       <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
-                           Revisa nuestras  <span className="bg-gradient-to-r from-violet-500 to-sky-500 bg-clip-text text-transparent">promociones</span>
-                       </h1>
+        <div>
+            {/* PANTALLAS ESCRITORIO*/}
+            <div className="hidden md:block">
+                <section className="mt-50 px-6">
+                    <div className="max-w-7xl mx-auto text-center">
+                        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
+                            Revisa nuestras  <span className="bg-gradient-to-r from-violet-500 to-sky-500 bg-clip-text text-transparent">promociones</span>
+                        </h1>
 
-                       <p className="mt-4 text-gray-500 text-lg">
-                           No solo eliminamos el vello, transformamos tu relación con tu piel
-                       </p>
+                        <p className="mt-4 text-gray-500 text-lg">
+                            No solo eliminamos el vello, transformamos tu relación con tu piel
+                        </p>
 
 
 
-                       <div className="w-full -mt-30 ">
-                           <CarruselOfertas
-                               title=""
-                               images={Carrusel}
-                               intervalMs={1800}
-                           />
+                        <div className="w-full -mt-30 ">
+                            <CarruselOfertas
+                                title=""
+                                images={Carrusel}
+                                intervalMs={1800}
+                            />
 
-                           <Link href="/catalogo">
-                               <button className='
+                            <Link href="/catalogo">
+                                <button className='
                     -mt-30 border p-2 text-2xl w-100 rounded-3xl
                     bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400
                     text-white font-bold tracking-wide
@@ -86,20 +86,15 @@ export default function SeccionComuncacion() {
                     hover:brightness-110
                     active:scale-95
                     '>Comprar Ahora</button>
-                           </Link>
+                            </Link>
 
 
 
 
-                       </div>
-                   </div>
-               </section>
-           </div>
-
-
-
-
-
+                        </div>
+                    </div>
+                </section>
+            </div>
 
 
 
@@ -111,31 +106,36 @@ export default function SeccionComuncacion() {
 
 
 
-           {/* PANTALLAS CELULARES      */}
-           <div className="block md:hidden">
-               <section className="mt-50 px-6">
-                   <div className="max-w-7xl mx-auto text-center">
-                       <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
-                           Revisa nuestras  <span className="bg-gradient-to-r from-violet-500 to-sky-500 bg-clip-text text-transparent">promociones</span>
-                       </h1>
-
-                       <p className="mt-4 text-gray-500 text-lg">
-                           No solo eliminamos el vello, transformamos tu relación con tu piel
-                       </p>
-
-                       <br/>
 
 
 
-                       <div className="w-full -mt-30 ">
-                           <CarruselOfertas
-                               title=""
-                               images={Carrusel}
-                               intervalMs={1800}
-                           />
 
-                           <Link href="/catalogo">
-                               <button className='
+
+            {/* PANTALLAS CELULARES      */}
+            <div className="block md:hidden">
+                <section className="mt-50 px-6">
+                    <div className="max-w-7xl mx-auto text-center">
+                        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
+                            Revisa nuestras  <span className="bg-gradient-to-r from-violet-500 to-sky-500 bg-clip-text text-transparent">promociones</span>
+                        </h1>
+
+                        <p className="mt-4 text-gray-500 text-lg">
+                            No solo eliminamos el vello, transformamos tu relación con tu piel
+                        </p>
+
+                        <br />
+
+
+
+                        <div className="w-full -mt-30 ">
+                            <CarruselOfertas
+                                title=""
+                                images={Carrusel}
+                                intervalMs={1800}
+                            />
+
+                            <Link href="/catalogo">
+                                <button className='
                     -mt-50 border p-2 text-2xl w-70 rounded-3xl
                     bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400
                     text-white font-bold tracking-wide
@@ -146,16 +146,16 @@ export default function SeccionComuncacion() {
                     hover:brightness-110
                     active:scale-95
                     '>Comprar Ahora</button>
-                           </Link>
+                            </Link>
 
 
 
 
-                       </div>
-                   </div>
-               </section>
-           </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
 
-       </div>
+        </div>
     );
 }

@@ -1,210 +1,202 @@
 "use client";
 
 import Link from "next/link";
-import { Facebook, Instagram, MapPin, Phone, Mail } from "lucide-react";
+import { ArrowUpRight, Instagram, Mail, MessageCircle } from "lucide-react";
 
-// TikTok (inline SVG)
-function TikTokIcon({ className = "" }) {
-    return (
-        <svg
-            className={className}
-            viewBox="0 0 48 48"
-            fill="currentColor"
-            aria-hidden="true"
-        >
-            <path d="M34.3 8.2c1.7 2 4 3.3 6.5 3.7v6.1c-2.5 0-4.8-.7-6.9-1.9v14.5c0 6.7-5.4 12.2-12.2 12.2S9.5 37.3 9.5 30.6s5.4-12.2 12.2-12.2c.7 0 1.4.1 2 .2v6.6c-.6-.2-1.3-.4-2-.4-3 0-5.4 2.4-5.4 5.4s2.4 5.4 5.4 5.4 5.4-2.4 5.4-5.4V5.5h6.2c.1 1 .5 1.9 1 2.7z" />
-        </svg>
-    );
-}
-
-// WhatsApp (inline SVG)
-function WhatsAppIcon({ className = "" }) {
-    return (
-        <svg
-            className={className}
-            viewBox="0 0 32 32"
-            fill="currentColor"
-            aria-hidden="true"
-        >
-            <path d="M19.1 17.3c-.2-.1-1.3-.6-1.5-.7-.2-.1-.4-.1-.6.1-.2.2-.7.7-.8.9-.1.2-.3.2-.5.1-.2-.1-.9-.3-1.8-1.1-.7-.6-1.1-1.3-1.3-1.5-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.3.3-.4.1-.2.1-.3 0-.5-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.9.9-.9 2.2 0 1.3.9 2.5 1 2.7.1.2 1.8 2.8 4.4 3.9.6.3 1.1.5 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.3-.5 1.5-1 .2-.5.2-1 .1-1.1-.1-.1-.3-.2-.5-.3z" />
-            <path d="M16 3C8.8 3 3 8.8 3 16c0 2.3.6 4.5 1.7 6.4L3 29l6.8-1.8c1.9 1 4 1.6 6.2 1.6 7.2 0 13-5.8 13-13S23.2 3 16 3zm0 23.5c-2 0-3.9-.5-5.6-1.5l-.4-.2-4 1.1 1.1-3.9-.2-.4c-1-1.7-1.6-3.7-1.6-5.7C5.3 9.9 10 5.3 16 5.3S26.7 10 26.7 16 22.1 26.5 16 26.5z" />
-        </svg>
-    );
-}
-
-const socials = [
-    { name: "Facebook", href: "https://www.facebook.com/profile.php?id=61586147694822", icon: Facebook },
-    { name: "Instagram", href: "https://www.instagram.com/siluetachicoficial/", icon: Instagram },
-    { name: "TikTok", href: "https://www.tiktok.com/@silueta.chic?_r=1&_t=ZM-91rfsGhFSQN", icon: TikTokIcon },
-    { name: "WhatsApp", href: "https://wa.me/56977173029", icon: WhatsAppIcon },
+const footerOptions = [
+  {
+    title: "Dr. Renzo Tais",
+    href: "/dr-renzo-tais",
+    text: "Médico Cirujano, especialista en Medicina Estética (Universidad de Buenos Aires) y especialista en Nefrología.",
+  },
+  {
+    title: "Misión y Visión",
+    href: "/mision-y-vision",
+    text: "Nuestra misión es brindar conocimientos y tratamientos de medicina estética de manera personalizada y de alta calidad, logrando mejorar la apariencia y el bienestar de las personas, utilizando tecnologías y procedimientos avanzados, en un entorno seguro, confiable y acogedor. Así, mi compromiso es brindar siempre resultados naturales que realcen la belleza individual de cada paciente, mejorando la autoestima y el cuidado integral de las personas.",
+  },
+  {
+    title: "Servicios",
+    href: "/servicios",
+    text: "Protocolos médicos no invasivos de armonización facial, contorno corporal y tecnología avanzada para resultados naturales.",
+  },
+  {
+    title: "Ultraformer",
+    href: "/ultraformer",
+    text: "Ultraformer MPT es la última palabra para el tratamiento de flacidez, contorno corporal y anclaje muscular en el mundo.",
+  },
 ];
 
-export default function FooterSiluetaChic() {
-    return (
-        <footer className="bg-neutral-950 text-neutral-300">
-            <div className="mx-auto max-w-6xl px-6 pt-14">
-                {/* Top grid */}
-                <div className="grid gap-10 md:grid-cols-4">
-                    {/* Brand */}
-                    <div>
-                        <h3 className="text-lg font-semibold text-white">Silueta Chic Estudio</h3>
-                        <p className="mt-4 text-sm leading-6 text-neutral-400">
-                            Especialistas en Depilación Triláser avanzada sin dolor en el corazón de Ñuñoa. Tecnología de última generación para resultados visibles, seguros y duraderos desde la primera sesión.
-                        </p>
+const quickLinks = [
+  ["Inicio", "/"],
+  ["Dr. Renzo Tais", "/dr-renzo-tais"],
+  ["Misión y Visión", "/mision-y-vision"],
+  ["Servicios", "/servicios"],
+  ["Ultraformer", "/ultraformer"],
+  ["Contacto", "/contacto"],
+];
 
-                        <div className="mt-6 flex items-center gap-4">
-                            {/* Social icons */}
-                            <div className="flex items-center gap-3">
-                                {socials.map((s) => {
-                                    const Icon = s.icon;
-                                    return (
-                                        <a
-                                            key={s.name}
-                                            href={s.href}
-                                            aria-label={s.name}
-                                            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white/90 ring-1 ring-white/10 transition hover:bg-white/15 hover:text-indigo-600"
-                                        >
-                                            <Icon className="h-5 w-5" />
-                                        </a>
-                                    );
-                                })}
-                            </div>
-
-                            {/* Brand icon */}
-                            <img
-                                src="/logofooter.png"
-                                alt="Silueta Chic"
-                                className="h-40 w-auto object-contain opacity-90"
-                            />
-                        </div>
-                    </div>
-
-
-                    {/* Quick links */}
-                    <div>
-                        <h3 className="text-lg font-semibold text-white">Enlaces Rápidos</h3>
-                        <ul className="mt-4 space-y-3 text-sm text-neutral-400">
-                            {[
-                                ["Inicio", "/"],
-                                ["Depilacion Mujer", "/catalogo"],
-                                ["Depilacion Hombre", "/catalogo?seccion=hombre"],
-                                ["Agenda tus Sesiones", "/AgendaProceso"],
-                            ].map(([label, href]) => (
-                                <li key={label}>
-                                    <Link
-                                        href={href}
-                                        className="transition hover:text-indigo-600"
-                                    >
-                                        {label}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Info */}
-                    <div>
-                        <h3 className="text-lg font-semibold text-white">Información</h3>
-                        <ul className="mt-4 space-y-3 text-sm text-neutral-400">
-                            {[
-                                ["Cuidados Previos", "/dudas?seleccionFooter=previos"],
-                                ["Cuidados Posteriores", "/dudas?seleccionFooter=posteriores"],
-                                ["Preguntas frecuentes", "/dudas?seleccionFooter=frecuentes"],
-                                ["Prohibiciones", "/dudas?seleccionFooter=prohibiciones"],
-                            ].map(([label, href]) => (
-                                <li key={label}>
-                                    <Link href={href} className="transition hover:text-indigo-600">
-                                        {label}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-
-                    {/* Contact */}
-                    <div>
-                        <h3 className="text-lg font-semibold text-white">Contacto</h3>
-
-                        <ul className="mt-4 space-y-3 text-sm text-neutral-400">
-                            <li className="flex gap-3">
-                                <MapPin className="mt-0.5 h-5 w-5 flex-none text-white/80" />
-                                <span>
-                     Avenida Irarrázaval 1989, Oficina 204 placa sur, Ñuñoa
-                      </span>
-                            </li>
-
-                            <li className="flex items-center gap-3">
-                                <Phone className="h-5 w-5 flex-none text-white/80" />
-                                <a href="tel:+56977173029" className="hover:text-indigo-600">
-                                    +56 9 7717 3029
-                                </a>
-                            </li>
-
-                            <li className="flex items-center gap-3">
-                                <Mail className="h-5 w-5 flex-none text-white/80" />
-                                <a
-                                    href="mailto:siluetachicestudio@gmail.com"
-                                    className="hover:text-indigo-600"
-                                >
-                                    siluetachicestudio@gmail.com
-                                </a>
-                            </li>
-
-                            <li className="flex items-center gap-3">
-                                <WhatsAppIcon className="h-5 w-5 flex-none text-white/80" />
-                                <a
-                                    href="https://wa.me/56977173029"
-                                    className="hover:text-indigo-600"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                >
-                                    WhatsApp
-                                </a>
-                            </li>
+export default function FooterPremiumMedico() {
+  return (
+    <footer
+      id="footer"
+      className="relative overflow-hidden scroll-mt-28 bg-[#eef2f8] text-slate-900 md:scroll-mt-32"
+    >
 
 
 
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(148,163,184,0.22),transparent_34%),radial-gradient(circle_at_90%_0%,rgba(59,130,246,0.12),transparent_40%)]" />
 
-                        </ul>
-                    </div>
-                </div>
+      <div className="relative mx-auto w-full max-w-6xl px-6 pb-20 pt-16 md:px-10 md:pb-24 md:pt-20">
+        <div className="flex flex-col gap-12 md:flex-row md:items-end md:justify-between">
 
-                {/* Map */}
-                <div className="mt-12 overflow-hidden rounded-2xl bg-white/5 ring-1 ring-white/10">
-                    <div className="relative aspect-[16/6] w-full">
-                        <iframe
-                            className="absolute inset-0 w-full h-full"
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3328.833121608925!2d-70.61308342614629!3d-33.453653997673065!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662cf8e24e33aef%3A0xc87340a985daad3!2sAv.%20Irarr%C3%A1zaval%201989%2C%207750000%20%C3%91u%C3%B1oa%2C%20Regi%C3%B3n%20Metropolitana!5e0!3m2!1ses-419!2scl"
-                            loading="lazy"
-                            referrerPolicy="no-referrer-when-downgrade"
-                            allowFullScreen
-                        />
-                    </div>
-                </div>
 
-                {/* Bottom */}
-                <div className="mt-10 border-t border-white/10 py-8 text-center">
-                    <p className="text-sm text-neutral-500">
-                        © {new Date().getFullYear()} Silueta.Chic. Todos los derechos
-                        reservados.
-                    </p>
-                    <p className="mt-3 text-sm text-neutral-600">
-                        Depilación Triláser Avanzada - Santiago, Chile
-                    </p>
-                    <p className="mt-2 text-xs text-neutral-600">
-                      Plataforma desarrollada por{" "}
-                      <a
-                        href="https://nativecode.cl"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="font-medium text-neutral-500 hover:text-indigo-600 transition"
-                      >
-                        NativeCode.cl
-                      </a>
-                    </p>
-                </div>
+          
+
+
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+              Contenido destacado
+            </p>
+            <h3 className="mt-5 max-w-4xl text-4xl leading-[1.12] text-slate-900 sm:text-5xl">
+              Dr. Renzo Tais,
+              <br />
+              conóceme.
+            </h3>
+            <p className="mt-8 max-w-3xl text-justify text-base leading-relaxed text-slate-600">
+              Conoce nuestro contenido destacado, con información detallada sobre mi formación, experiencia y enfoque en medicina estética integral. Descubre cómo puedo ayudarte a realzar tu belleza única a través de tratamientos personalizados y resultados naturales.
+              
+            </p>
+          </div>
+
+          <div className="mb-2 flex h-10 w-40 items-center justify-center rounded-xl text-[10px] font-medium uppercase tracking-[0.14em] text-slate-400">
+            <img 
+            src="/dr1.png"
+              alt="Logo Dr. Renzo Tais"
+              width={98}
+              height={98}
+              className="h-auto w-auto rounded-full object-cover object-center"
+              loading="lazy" />
+          </div>
+        </div>
+
+        <div className="mt-16 grid gap-8 md:grid-cols-2">
+          {footerOptions.map((item) => (
+            <article
+              key={item.title}
+              className="group rounded-[2rem] border border-white/80 bg-white/85 p-9 shadow-[0_20px_50px_-35px_rgba(15,23,42,0.45)] backdrop-blur transition hover:-translate-y-0.5 hover:shadow-[0_26px_65px_-35px_rgba(15,23,42,0.55)]"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <h4 className="text-2xl leading-tight text-slate-900">{item.title}</h4>
+                <Link
+                  href={item.href}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition group-hover:border-slate-500 group-hover:text-slate-900"
+                  aria-label={`Ir a ${item.title}`}
+                >
+                  <ArrowUpRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <p className="mt-7 text-[15px] leading-8 text-slate-600">{item.text}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div className="relative mx-auto w-full max-w-6xl px-6 pb-14 md:px-10 md:pb-16">
+        <div className="rounded-[2rem] border border-slate-200 bg-white px-8 py-14 shadow-[0_18px_48px_-38px_rgba(15,23,42,0.35)] md:px-11 md:py-16">
+          <div className="grid gap-16 md:grid-cols-3">
+            <div>
+              <h4 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">
+                Dr. Renzo Tais
+              </h4>
+              <p className="mt-5 max-w-sm text-[15px] leading-8 text-slate-600">
+                Atención personalizada en Providencia, Santiago de Chile, con enfoque
+                médico, seguro y natural.
+              </p>
             </div>
-        </footer>
-    );
+
+            <div>
+              <h4 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">
+                Navegación
+              </h4>
+              <ul className="mt-6 grid grid-cols-1 gap-4 text-[15px] sm:grid-cols-2">
+                {quickLinks.map(([label, href]) => (
+                  <li key={label}>
+                    <Link href={href} className="text-slate-700 transition hover:text-slate-950">
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">
+                Contacto
+              </h4>
+              <ul className="mt-6 space-y-4 text-[15px] leading-relaxed text-slate-700">
+                <li>
+                  <a href="mailto:drtaismedestetica@gmail.com" className="text-slate-700 transition hover:text-slate-950">
+                    <Mail className="inline mr-2 h-6 w-6" />
+                    drtaismedestetica@gmail.com
+                    
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://wa.me/56994836980"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group inline-flex items-center gap-3 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-800 shadow-[0_12px_28px_-18px_rgba(15,23,42,0.35)] transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-[0_16px_34px_-18px_rgba(15,23,42,0.42)]"
+                    aria-label="WhatsApp de Dr. Renzo Tais"
+                  >
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 ring-1 ring-emerald-200">
+                      <MessageCircle className="h-4 w-4 text-emerald-600" />
+                    </span>
+                    <span className="flex flex-col leading-tight">
+                      <span className="text-[13px] font-semibold text-slate-800">
+                        Escríbenos por WhatsApp
+                      </span>
+                      <span className="text-[12px] text-slate-600">+56 9 9483 6980</span>
+                    </span>
+                  </a>
+                </li>
+                <li>Ubicación: Providencia, Santiago de Chile</li>
+                <li>
+                  <a
+                    href="https://www.instagram.com/dr.renzotais"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 underline decoration-slate-300 underline-offset-2 transition hover:text-slate-900"
+                    aria-label="Instagram de Dr. Renzo Tais"
+                  >
+                    <Instagram className="h-6 w-6" />
+                    <span>@dr.renzotais</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-slate-200/80 bg-white/70">
+        <div className="mx-auto flex w-full max-w-6xl flex-col items-start justify-between gap-3 px-6 py-6 text-xs text-slate-500 md:flex-row md:items-center md:px-10">
+          <p>
+            © {new Date().getFullYear()} Dr. Renzo Tais. Todos los derechos reservados.
+          </p>
+          <p>
+            Desarrollado por{" "}
+            <a
+              href="https://www.nativecode.cl"
+              target="_blank"
+              rel="noreferrer"
+              className="underline decoration-slate-400/60 underline-offset-2 transition hover:text-slate-700"
+            >
+              Nativecode.cl
+            </a>
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
 }

@@ -1,97 +1,81 @@
-// src/app/layout.jsx
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
 import { AnimatedLayout } from "@/Componentes/AnimatedLayout";
 import AgendaProvider from "@/ContextosGlobales/AgendaContext";
+import { Cormorant_Garamond, Manrope } from "next/font/google";
 
-// Metadata optimizada SEO para Silueta Chic – Centro de Depilación Triláser en Ñuñoa, Santiago
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-cormorant",
+});
+
 export const metadataBase = new URL(
-  process.env.NEXT_PUBLIC_SITE_URL || "https://siluetachic.cl"
+  process.env.NEXT_PUBLIC_SITE_URL || "https://www.drtais.com"
 );
 
 export const metadata = {
   title: {
-    default: "Silueta Chic | Centro de Depilación Triláser en Ñuñoa",
-    template: "%s | Silueta Chic",
+    default: "Dr. Renzo Tais | Cirugía Plástica y Medicina Estética",
+    template: "%s | Dr. Renzo Tais",
   },
   description:
-    "Silueta Chic es un centro profesional de depilación triláser en Ñuñoa, Santiago. Especialistas en depilación corporal femenina y masculina, tratamientos seguros, tecnología avanzada y atención personalizada.",
-  icons: {
-    icon: "/silueta.ico",
-    shortcut: "/silueta.ico",
-    apple: "/silueta.png",
-  },
+    "Sitio oficial del Dr. Renzo Tais. Cirugía plástica y medicina estética con enfoque personalizado, tecnología avanzada y resultados naturales.",
   keywords: [
-    "depilación triláser",
-    "depilación láser Santiago",
-    "depilación láser Ñuñoa",
-    "centro de depilación",
-    "depilación corporal",
-    "depilación profesional",
-    "depilación femenina",
-    "depilación masculina",
-    "depilación definitiva",
-    "Silueta Chic",
-    "depilación láser clínica estética",
-    "triláser Ñuñoa",
-    "centro de estética Santiago",
+    "Dr. Renzo Tais",
+    "cirugía plástica",
+    "medicina estética",
+    "cirugía estética",
+    "rejuvenecimiento facial",
+    "contorno corporal",
+    "ultraformer",
   ],
-  authors: [{ name: "Silueta Chic", url: metadataBase.href }],
-  publisher: "Silueta Chic",
+  authors: [{ name: "Dr. Renzo Tais", url: metadataBase.href }],
+  publisher: "Dr. Renzo Tais",
   robots: {
     index: true,
     follow: true,
     "max-snippet": -1,
     "max-image-preview": "large",
     "max-video-preview": -1,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-    },
   },
   alternates: {
     canonical: metadataBase.href,
   },
   openGraph: {
-    title: "Silueta Chic | Depilación Triláser Profesional en Ñuñoa",
+    title: "Dr. Renzo Tais | Cirugía Plástica y Medicina Estética",
     description:
-      "Centro especializado en depilación triláser en Ñuñoa, Santiago. Resultados efectivos, tecnología avanzada y especialistas en depilación corporal.",
+      "Atención médica personalizada en cirugía plástica y estética facial/corporal.",
     url: metadataBase.href,
-    siteName: "Silueta Chic",
-    images: [
-      {
-        url: `${metadataBase.href.replace(/\/$/, "")}/og-silueta-chic.png`,
-        width: 1200,
-        height: 630,
-        alt: "Silueta Chic - Centro de Depilación Triláser",
-      },
-    ],
+    siteName: "Dr. Renzo Tais",
     locale: "es_CL",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Silueta Chic | Depilación Triláser en Ñuñoa",
+    title: "Dr. Renzo Tais | Cirugía Plástica",
     description:
-      "Depilación triláser profesional en Ñuñoa, Santiago. Especialistas en depilación corporal con tecnología avanzada.",
-    images: [`${metadataBase.href.replace(/\/$/, "")}/og-silueta-chic.png`],
+      "Sitio oficial con información de procedimientos, evaluación y contacto.",
+  },
+  icons: {
+    icon: "/dr1.png",
+    shortcut: "/dr1.png",
+    apple: "/dr1.png",
   },
 };
 
 export default function RootLayout({ children }) {
-    return (
-        <ClerkProvider>
-            <html lang="es">
-            <body className="min-h-screen bg-white">
-            {/* Aquí usamos el componente cliente que ya maneja Motion */}
-            <AnimatedLayout>
-                <AgendaProvider>
-                    {children}
-                </AgendaProvider>
-            </AnimatedLayout>
-            </body>
-            </html>
-        </ClerkProvider>
-    );
+  return (
+    <html lang="es" className={`${manrope.variable} ${cormorant.variable}`}>
+      <body className="min-h-screen bg-white">
+        <AnimatedLayout>
+          <AgendaProvider>{children}</AgendaProvider>
+        </AnimatedLayout>
+      </body>
+    </html>
+  );
 }

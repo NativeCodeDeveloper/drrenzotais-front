@@ -21,9 +21,6 @@ matcher: ['/dashboard/:path*'], // o simplemente [] si quieres que no aplique a 
 
 
 
-
-
-
 // TypeScript
 // archivo: `frontend/src/middleware.ts`
 import { clerkMiddleware, clerkClient, createRouteMatcher } from '@clerk/nextjs/server'
