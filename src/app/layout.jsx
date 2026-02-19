@@ -1,6 +1,7 @@
 import "./globals.css";
 import { AnimatedLayout } from "@/Componentes/AnimatedLayout";
 import AgendaProvider from "@/ContextosGlobales/AgendaContext";
+import CarritoProvider from "@/ContextosGlobales/CarritoContext";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 
 const manrope = Manrope({
@@ -73,7 +74,9 @@ export default function RootLayout({ children }) {
     <html lang="es" className={`${manrope.variable} ${cormorant.variable}`}>
       <body className="min-h-screen bg-white">
         <AnimatedLayout>
-          <AgendaProvider>{children}</AgendaProvider>
+          <AgendaProvider>
+            <CarritoProvider>{children}</CarritoProvider>
+          </AgendaProvider>
         </AnimatedLayout>
       </body>
     </html>
