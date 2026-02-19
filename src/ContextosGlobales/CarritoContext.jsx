@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
 
-const CarritoContext = createContext(null);
+const CarritoContext = createContext([[], () => {}]);
 
 export default function CarritoProvider({ children }) {
 
@@ -35,8 +35,5 @@ export default function CarritoProvider({ children }) {
 
 export const useCarritoGlobal = () => {
     const context = useContext(CarritoContext);
-    if (!context) {
-        throw new Error("useCarritoGlobal debe usarse dentro de un <CarritoProvider>");
-    }
     return context;
 };
