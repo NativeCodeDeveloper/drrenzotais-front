@@ -1,16 +1,10 @@
 "use client";
 import {useMemo, useState, useEffect, useRef} from "react";
-import {Michroma} from "next/font/google";
 import {useAgenda} from "@/ContextosGlobales/AgendaContext";
 import Link from "next/link";
 import ShadcnButton2 from "@/Componentes/shadcnButton2";
 import {toast} from "react-hot-toast";
 import * as React from "react";
-
-const michroma = Michroma({
-    subsets: ["latin"],
-    weight: "400",
-});
 
 function formatDateToYMD(date) {
     const y = date.getFullYear();
@@ -47,8 +41,7 @@ export default function CalendarioMensualHoras() {
     };
 
     // Genera los bloques de atención (60 min) según el día de la semana
-    // Lunes a Viernes: 09:00 - 20:00
-    // Sábado: 09:00 - 16:00
+    // Lunes a Sábado: 09:00 - 22:00
     // Domingo: No disponible
     // Los inicios van separados por 70 minutos (60 atención + 10 descanso), pero los descansos no se muestran.
     const attentionSlots = useMemo(() => {
@@ -61,8 +54,8 @@ export default function CalendarioMensualHoras() {
 
         const slots = [];
         const startMinutes = 9 * 60; // 09:00
-        // Sábado hasta 16:00, resto hasta 20:00
-        const endMinutes = dayOfWeek === 6 ? 16 * 60 : 20 * 60;
+        // Lunes a Sábado hasta 22:00
+        const endMinutes = 22 * 60;
         let cursor = startMinutes;
 
         const minutesToHHMM = (min) => {
@@ -110,7 +103,7 @@ export default function CalendarioMensualHoras() {
         // Validar que no sea domingo
         const dayOfWeek = fecha.getDay();
         if (dayOfWeek === 0) {
-            toast.error("Las atenciones son de Lunes a Sábado.\nLun-Vie: 9:00-20:00 | Sáb: 9:00-16:00", {
+            toast.error("Las atenciones son de Lunes a Sábado.\nLun-Sáb: 9:00-22:00", {
                 duration: 4000,
                 style: {
                     background: '#FEE2E2',
@@ -359,16 +352,16 @@ export default function CalendarioMensualHoras() {
             <div className="mx-auto w-full max-w-3xl">
                 <header className="mb-6 flex flex-col items-center gap-2 text-center">
                     <div
-                        className="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-xs font-medium text-slate-600">
+                        className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
                         Agenda · Online
                     </div>
 
                     <h1
                         className={`text-3xl sm:text-4xl font-black tracking-widest `}
                     >
-                        <span className="bg-gradient-to-r from-purple-700 via-indigo-500 to-cyan-600 text-transparent bg-clip-text ">Silueta Chic</span>
+                        <span className="bg-gradient-to-r from-slate-900 via-gray-800 to-slate-700 text-transparent bg-clip-text ">Dr. Renzo Tais</span>
                         <span
-                            className="relative mt-1 block h-1 w-40 max-w-full rounded-full bg-gradient-to-r from-sky-300 via-sky-200 to-transparent"
+                            className="relative mt-1 block h-1 w-40 max-w-full rounded-full bg-gradient-to-r from-slate-400 via-slate-200 to-transparent"
                         />
                     </h1>
 
@@ -377,17 +370,17 @@ export default function CalendarioMensualHoras() {
                     </p>
                 </header>
 
-                <div className="rounded-2xl border border-sky-200/60 bg-white/80 p-4 shadow-lg shadow-slate-900/5 backdrop-blur supports-[backdrop-filter]:bg-white/70 text-slate-800">
+                <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-lg shadow-slate-900/5 backdrop-blur supports-[backdrop-filter]:bg-white/70 text-slate-800">
                     <div className="flex items-center justify-between">
                         <h2 className="text-sm font-semibold text-slate-800">Agenda mensual</h2>
                         <span className="text-[12px] text-slate-500">Selecciona un día</span>
                     </div>
-                    <div className="mt-3 h-px w-full bg-gradient-to-r from-transparent via-sky-200 to-transparent"/>
+                    <div className="mt-3 h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent"/>
 
                     {/* Navegación mes */}
                     <div className="mt-3 flex items-center justify-between">
                         <button
-                            className="rounded-lg border border-sky-200/70 bg-white/80 px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/5 hover:bg-white active:scale-[0.98] hover:shadow-lg hover:shadow-slate-900/10"
+                            className="rounded-lg border border-gray-900 bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white shadow-md shadow-slate-900/5 hover:bg-gray-800 active:scale-[0.98] hover:shadow-lg hover:shadow-slate-900/10"
                             onClick={() => {
                                 setMesActual(new Date(mesActual.setMonth(mesActual.getMonth() - 1)));
                                 setFechaSeleccionada(null);
@@ -403,7 +396,7 @@ export default function CalendarioMensualHoras() {
                             {mesActual.toLocaleString("es-CL", {month: "long", year: "numeric"})}
                         </strong>
                         <button
-                            className="rounded-lg border border-sky-200/70 bg-white/80 px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-md shadow-slate-900/5 hover:bg-white active:scale-[0.98] hover:shadow-lg hover:shadow-slate-900/10"
+                            className="rounded-lg border border-gray-900 bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white shadow-md shadow-slate-900/5 hover:bg-gray-800 active:scale-[0.98] hover:shadow-lg hover:shadow-slate-900/10"
                             onClick={() => {
                                 setMesActual(new Date(mesActual.setMonth(mesActual.getMonth() + 1)));
                                 setFechaSeleccionada(null);
@@ -445,12 +438,12 @@ export default function CalendarioMensualHoras() {
                                             seleccionarFecha(dia);
                                         }}
                                         className={
-                                            "h-10 flex items-center justify-center rounded-md text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-sky-200 focus:ring-offset-1 " +
+                                            "h-10 flex items-center justify-center rounded-md text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-1 " +
                                             (isDisabled
                                                 ? "cursor-not-allowed border border-slate-200/70 bg-white/60 text-slate-400 shadow-sm" + (isSunday ? " opacity-50" : "")
                                                 : isSelected
-                                                    ? "border border-sky-300 bg-gradient-to-b from-sky-100 to-white text-slate-900 shadow-md shadow-sky-900/10"
-                                                    : "border border-sky-200/80 bg-white/90 text-slate-700 shadow-sm hover:bg-white hover:border-sky-300 hover:shadow-md hover:shadow-slate-900/5")
+                                                    ? "border border-gray-900 bg-gray-900 text-white shadow-md shadow-gray-900/10"
+                                                    : "border border-slate-200 bg-white/90 text-slate-700 shadow-sm hover:bg-white hover:border-gray-400 hover:shadow-md hover:shadow-slate-900/5")
                                         }
                                     >
                                         {dia.getDate()}
@@ -467,13 +460,13 @@ export default function CalendarioMensualHoras() {
                         <div className="mt-5">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-sm font-semibold text-slate-800">
-                                    Agenda ({fechaSeleccionada.getDay() === 6 ? '09:00–16:00 (Sábado)' : '09:00–20:00'})
+                                    Agenda (09:00–22:00)
                                 </h3>
                                 <div className="flex items-center gap-3">
                                     <p className="text-xs text-slate-500">Bloques de 60 min</p>
                                     {checkingBlocked && (
                                         <div className="flex items-center gap-2 text-xs text-slate-500">
-                                            <svg className="w-3 h-3 animate-spin text-sky-500"
+                                            <svg className="w-3 h-3 animate-spin text-slate-500"
                                                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                 <circle className="opacity-25" cx="12" cy="12" r="10"
                                                         stroke="currentColor" strokeWidth="4"></circle>
@@ -516,7 +509,7 @@ export default function CalendarioMensualHoras() {
 
                                     return (
                                         <div key={entry.start}
-                                             className={"flex items-center justify-between rounded-xl border p-3 bg-white/90 border-sky-200/50 shadow-sm hover:shadow-md hover:shadow-slate-900/5 transition"}>
+                                             className={"flex items-center justify-between rounded-xl border p-3 shadow-sm hover:shadow-md hover:shadow-slate-900/5 transition " + (selected ? "bg-green-50 border-green-300" : "bg-white/90 border-slate-200")}>
                                             <div>
                                                 <div className="text-sm font-medium text-slate-800">Atención</div>
                                                 <div className="text-xs text-slate-500">{entry.start} – {entry.end}</div>
@@ -524,7 +517,7 @@ export default function CalendarioMensualHoras() {
                                             <div className="flex items-center gap-3">
                                                 <button
                                                     onClick={() => seleccionarInicio(entry.start)}
-                                                    className={"px-3 py-1 rounded-lg font-semibold shadow-sm transition active:scale-[0.98] " + (selected ? 'bg-gradient-to-r from-sky-600 to-cyan-600 text-white shadow-md shadow-sky-900/15' : 'bg-white/90 border border-sky-200/80 text-sky-700 hover:bg-white hover:shadow-md hover:shadow-slate-900/5')}
+                                                    className={"px-3 py-1 rounded-lg font-semibold shadow-sm transition active:scale-[0.98] " + (selected ? 'bg-green-600 text-white shadow-md' : 'bg-gray-900 text-white hover:bg-gray-800 hover:shadow-md hover:shadow-slate-900/5')}
                                                 >
                                                     {selected ? 'Seleccionada' : 'Seleccionar'}
                                                 </button>
@@ -559,10 +552,6 @@ export default function CalendarioMensualHoras() {
                                 )}
                             </div>
 
-                            {/* Resumen de verificación (debug) */}
-                            <div className="mt-4 text-center text-xs text-slate-600">
-                                <span>Bloqueados: {checkSummary.blocked} / {checkSummary.total} slots</span>
-                            </div>
                         </div>
                     )}
                 </div>
@@ -583,7 +572,7 @@ export default function CalendarioMensualHoras() {
                         Depilación Trilaser Indolora, Tu piel suave y libre todo el año.
                     </p>
                     <p className="mt-2 text-[11px] text-slate-400">
-                        Horarios: Lun-Vie 9:00-20:00 | Sáb 9:00-16:00 | Dom Cerrado
+                        Horarios: Lun-Sáb 9:00-22:00 | Dom Cerrado
                     </p>
                 </footer>
             </div>

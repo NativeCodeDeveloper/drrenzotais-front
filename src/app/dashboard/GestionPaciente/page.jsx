@@ -16,13 +16,6 @@ import {InfoButton} from "@/Componentes/InfoButton";
 
 export default function GestionPaciente() {
 
-    // Depuración: imprimir referencias a los componentes importados para detectar undefined
-    console.log('DEBUG imports:', {
-        Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
-        ToasterClients, ShadcnInput, ShadcnSelect, ShadcnButton, ShadcnDatePicker, UserIcon
-    })
-
-    //PARAMETROS USESTATE PARA INSERCION DE DATOS EN PACIENTES
     const API = process.env.NEXT_PUBLIC_API_URL;
     const [listaPacientes, setListaPacientes] = useState([]);
     const [nombre, setNombre] = useState("");
@@ -36,26 +29,15 @@ export default function GestionPaciente() {
     const [direccion, setDireccion] = useState("");
     const [pais, setPais] = useState("");
 
-
-    //PARAMETRO PARA BUSCAR POR SIMILITUD DE NOMBRES
     const [nombreBuscado, setNombreBuscado] = useState("");
-
-
-    //PARAMETRO PARA BUSCAR POR SIMILITUD DE RUT
     const [rutBuscado, setRutBuscado] = useState("");
 
-
-    //PARAMETRO PARA LA NAVEGACION ENTRE COMPONENTES EL COMPONENTE LE POGO NOMBRE DE ROUTER
     const router = useRouter();
 
-
-    //SE CREA UNA FUNCION PARA PODER NAVEGAR A LA RUTA DINAMICA POR ID DE CADA PACIENTE ( EN ESTE CASO USO LINK PERO EN CASO DE BOTON USAR ESTA FN
     function verDetallePaciente(id_paciente) {
         router.push(`/dashboard/paciente/${id_paciente}`);
     }
 
-
-    //FUNCION PARA ENCONTRAR PACIENTES POR SIMILITD DE RUT
     async function buscarRutSimilar(rutBuscado) {
         try {
             if (!rutBuscado) {
@@ -84,7 +66,6 @@ export default function GestionPaciente() {
                 } else {
                     return toast.error("No se han encontrado similitudes.")
                 }
-
             }
         } catch (err) {
             console.log(err);
@@ -92,11 +73,8 @@ export default function GestionPaciente() {
         }
     }
 
-
-//FUNCION PARA BUSCAR POR SIMILITUD DE NOMBRES
     async function buscarNombreSimilar(nombreBuscado) {
         try {
-
             let nombre = nombreBuscado.trim();
 
             if (!nombreBuscado) {
@@ -117,7 +95,6 @@ export default function GestionPaciente() {
             if (!res.ok) {
                 return res.json();
             } else {
-
                 const dataSimilar = await res.json();
 
                 if (Array.isArray(dataSimilar) && dataSimilar.length > 0) {
@@ -131,11 +108,8 @@ export default function GestionPaciente() {
             console.log(err);
             return toast.error("Ha habido un problema en el servidor por favor contacte a soporte de Medify");
         }
-
     }
 
-
-//FUNCION PARA INSERTAR NUEVOS PACIENTES
     async function insertarPaciente(nombre, apellido, rut, nacimiento, sexo, prevision, telefono, correo, direccion, pais) {
         try {
             let prevision_id = null;
@@ -179,7 +153,6 @@ export default function GestionPaciente() {
                 const respuestaBackend = await res.json();
 
                 if (respuestaBackend.message === true) {
-
                     setNombre("");
                     setApellido("");
                     setRut("");
@@ -187,19 +160,16 @@ export default function GestionPaciente() {
                     setCorreo("");
                     setDireccion("");
                     setPais("");
-                    await  listarPacientes();
+                    await listarPacientes();
                     return toast.success("Paciente ingresado correctamente.");
                 }
             }
         } catch (err) {
             console.error(err);
             return toast.error("Problema al Ingresar nuevo paciente en el servidor. Por favor contacte a soporte Tecnico de Medify")
-
         }
     }
 
-
-//FUNCION PARA LISTAR TODOS LOS PACIENTES INGRESADOS
     async function listarPacientes() {
         try {
             const res = await fetch(`${API}/pacientes`, {
@@ -216,11 +186,9 @@ export default function GestionPaciente() {
                 const dataPacientes = await res.json()
                 setListaPacientes(dataPacientes);
             }
-
         } catch (error) {
             console.log(error);
             return toast.success("Ha ocurrido un error contacte a soporte de Medify");
-
         }
     }
 
@@ -228,68 +196,57 @@ export default function GestionPaciente() {
         listarPacientes();
     }, [])
 
-
-    // OBJETO JS QUE SE LE PASA LA DATA ENCONTRADA EN LA PETICION HTTP AL BACKEND ( DE ACA SE LISTAN)
-    const pacientesParaRenderizarEnTabla = listaPacientes;
-
-
     return (
-        <div className="min-h-screen bg-gray-50 p-6 sm:p-10">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50/30">
             <ToasterClients/>
-            <div className="max-w-5xl mx-auto">
-                <div className='flex justify-end'>
-                    <InfoButton informacion={"Este módulo de la aplicación está diseñado para registrar el libro de ficha clínica de un paciente. Cuando un paciente acude por primera vez a una sesión o consulta, debe ser ingresado una única vez en este apartado. De esta forma, el sistema almacenará sus datos demográficos, permitiendo posteriormente comenzar con la documentación de sus fichas clínicas.\n" +
-                        "\n" +
-                        "Es importante considerar que la agenda de un paciente no está directamente relacionada con su ingreso en el sistema. Un paciente puede estar agendado para una atención, pero no contará con ficha clínica hasta que sea registrado previamente en esta sección.\n" +
-                        "\n" +
-                        "Para editar la información de un paciente, en la tabla inferior se debe seleccionar el ícono de la persona ubicado bajo el título “Ver datos”. Al seleccionarlo, se podrá acceder a la información del paciente para modificarla o eliminarla, según sea necesario.\n" +
-                        "\n"}/>
-                </div>
 
-                <div className="mb-6">
-                    <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight">Gestión e Ingreso
-                        de pacientes</h1>
-                    <p className="mt-2 text-gray-600 max-w-2xl">Registra pacientes rápidamente para abrir su ficha
-                        clínica.</p>
-                </div>
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
 
+                {/* Header */}
+                <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <p className="text-xs font-semibold uppercase tracking-widest text-sky-600 mb-1">Administración</p>
+                        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
+                            Gestión de Pacientes
+                        </h1>
+                        <p className="text-sm text-slate-500 mt-1">Registra pacientes rápidamente para abrir su ficha clínica</p>
+                    </div>
+                    <InfoButton informacion={"Este módulo de la aplicación está diseñado para registrar el libro de ficha clínica de un paciente. Cuando un paciente acude por primera vez a una sesión o consulta, debe ser ingresado una única vez en este apartado. De esta forma, el sistema almacenará sus datos demográficos, permitiendo posteriormente comenzar con la documentación de sus fichas clínicas.\n\nEs importante considerar que la agenda de un paciente no está directamente relacionada con su ingreso en el sistema. Un paciente puede estar agendado para una atención, pero no contará con ficha clínica hasta que sea registrado previamente en esta sección.\n\nPara editar la información de un paciente, en la tabla inferior se debe seleccionar el ícono de la persona ubicado bajo el título \"Ver datos\". Al seleccionarlo, se podrá acceder a la información del paciente para modificarla o eliminarla, según sea necesario.\n"}/>
+                </div>
 
                 <div className="space-y-6">
 
-                    {/* Form card */}
-                    <div className="bg-white shadow-sm rounded-xl p-6 md:p-8 border border-sky-100">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-semibold text-gray-800">Ingreso de paciente</h2>
+                    {/* Formulario de ingreso */}
+                    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                        <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                            </svg>
+                            <h2 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">Ingreso de Paciente</h2>
                         </div>
 
-                        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-5">
-
-                            <div className="">
-                                <label className="text-sm font-medium text-gray-700">Nombre</label>
-                                <div className="mt-1">
+                        <div className="p-5 md:p-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Nombre</label>
                                     <ShadcnInput
                                         value={nombre}
-                                        placeholder={"Ej: Andrea Ignacia "}
+                                        placeholder={"Ej: Andrea Ignacia"}
                                         onChange={(e) => setNombre(e.target.value)}
-                                        className="bg-gray-50 w-full"/>
+                                        className="w-full"/>
                                 </div>
-                            </div>
 
-
-                            <div className="">
-                                <label className="text-sm font-medium text-gray-700">Apellido</label>
-                                <div className="mt-1">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Apellido</label>
                                     <ShadcnInput
                                         value={apellido}
-                                        placeholder={"Ej: Varela Garrido "}
+                                        placeholder={"Ej: Varela Garrido"}
                                         onChange={(e) => setApellido(e.target.value)}
-                                        className="bg-gray-50 w-full"/>
+                                        className="w-full"/>
                                 </div>
-                            </div>
 
-                            <div className="">
-                                <label className="text-sm font-medium text-gray-700">Número Identificación (RUT)</label>
-                                <div className="mt-1">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Número Identificación (RUT)</label>
                                     <ShadcnInput
                                         value={rut}
                                         onChange={(e) => {
@@ -300,24 +257,18 @@ export default function GestionPaciente() {
                                         className="w-full"
                                     />
                                 </div>
-                            </div>
 
-
-                            <div className="">
-                                <label className="text-sm font-medium text-gray-700">Sexo</label>
-                                <div className="mt-1">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Sexo</label>
                                     <ShadcnInput
                                         value={sexo}
                                         placeholder={"Ej: Femenino"}
                                         onChange={(e) => setSexo(e.target.value)}
-                                        className="bg-gray-50 w-full"/>
+                                        className="w-full"/>
                                 </div>
-                            </div>
 
-
-                            <div className="">
-                                <label className="text-sm font-medium text-gray-700">Seleccione Previsión</label>
-                                <div className="mt-1 w-full">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Previsión</label>
                                     <div className="w-full sm:max-w-xs">
                                         <ShadcnSelect
                                             nombreDefault={"Seleccion Prevision"}
@@ -326,184 +277,185 @@ export default function GestionPaciente() {
                                         />
                                     </div>
                                 </div>
-                            </div>
 
-
-                            <div className="">
-                                <label className="text-sm font-medium text-gray-700">Teléfono</label>
-                                <div className="mt-1">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Teléfono</label>
                                     <ShadcnInput
                                         value={telefono}
                                         placeholder={"Ej: +569 99764369"}
                                         onChange={(e) => setTelefono(e.target.value)}
-                                        className="bg-gray-50 w-full"/>
+                                        className="w-full"/>
                                 </div>
-                            </div>
 
-                            <div className="">
-                                <label className="text-sm font-medium text-gray-700">Correo</label>
-                                <div className="mt-1">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Correo</label>
                                     <ShadcnInput
                                         value={correo}
                                         placeholder={"CorreoDelPaciente@gmail.com"}
                                         onChange={(e) => setCorreo(e.target.value)}
-                                        className="bg-gray-50 w-full"/>
+                                        className="w-full"/>
                                 </div>
-                            </div>
 
-
-                            <div className="">
-                                <label className="text-sm font-medium text-gray-700">Dirección</label>
-                                <div className="mt-1">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Dirección</label>
                                     <ShadcnInput
                                         placeholder={"Avenida España 123 / Concepcion"}
                                         value={direccion}
                                         onChange={(e) => setDireccion(e.target.value)}
-                                        className="bg-gray-50 w-full"/>
+                                        className="w-full"/>
                                 </div>
-                            </div>
 
-                            <div className="">
-                                <label className="text-sm font-medium text-gray-700">País del Paciente</label>
-                                <div className="mt-1">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">País</label>
                                     <ShadcnInput
                                         value={pais}
                                         placeholder={"Ej: Argentina"}
                                         onChange={(e) => setPais(e.target.value)}
-                                        className="bg-gray-50 w-full"/>
+                                        className="w-full"/>
                                 </div>
-                            </div>
 
-
-                            <div className="sm:col-span-2">
-                                <div className="mt-1">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Fecha de Nacimiento</label>
                                     <ShadcnDatePicker
-                                        label="Fecha de nacimiento"
+                                        label=""
                                         value={nacimiento}
                                         onChange={(fecha) => setNacimiento(fecha)}
                                     />
                                 </div>
+
+                                <div className="sm:col-span-2 flex justify-end pt-2">
+                                    <button
+                                        className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-sky-600 to-cyan-500 rounded-lg hover:from-sky-700 hover:to-cyan-600 transition-all duration-150 shadow-md hover:shadow-lg"
+                                        type={"button"}
+                                        onClick={() => insertarPaciente(nombre, apellido, rut, nacimiento, sexo, prevision, telefono, correo, direccion, pais)}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        Ingresar Paciente
+                                    </button>
+                                </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <div className="sm:col-span-2 flex justify-end">
+                    {/* Búsqueda */}
+                    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                        <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <h2 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">Búsqueda de Pacientes</h2>
+                        </div>
 
+                        <div className="p-5 md:p-6">
+                            <p className="text-xs text-slate-400 mb-4">Busca por nombre o RUT para evitar duplicados</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Buscar por Nombre</label>
+                                    <div className="flex gap-2">
+                                        <ShadcnInput
+                                            placeholder="Ej: Nicolas Andres..."
+                                            value={nombreBuscado}
+                                            onChange={(e) => setNombreBuscado(e.target.value)}
+                                            className="w-full"
+                                        />
+                                        <button
+                                            onClick={() => buscarNombreSimilar(nombreBuscado)}
+                                            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-sky-600 to-cyan-500 rounded-lg hover:from-sky-700 hover:to-cyan-600 transition-all duration-150 shadow-sm flex-shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                            </svg>
+                                            Buscar
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Buscar por RUT</label>
+                                    <div className="flex gap-2">
+                                        <ShadcnInput
+                                            value={rutBuscado}
+                                            placeholder={"12.345.678-9"}
+                                            onChange={(e) => setRutBuscado(e.target.value)}
+                                            className="w-full"
+                                        />
+                                        <button
+                                            onClick={() => buscarRutSimilar(rutBuscado)}
+                                            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-sky-600 to-cyan-500 rounded-lg hover:from-sky-700 hover:to-cyan-600 transition-all duration-150 shadow-sm flex-shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                            </svg>
+                                            Buscar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Tabla de pacientes */}
+                    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                        <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <h2 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">Listado de Pacientes</h2>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <span className="inline-flex items-center justify-center h-6 min-w-[24px] px-2 rounded-full text-xs font-bold bg-sky-100 text-sky-700">
+                                    {listaPacientes.length}
+                                </span>
                                 <button
-                                    className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-blue-900 text-white font-semibold shadow hover:bg-blue-800 transition"
-                                    type={"button"}
-                                    onClick={() => insertarPaciente(nombre, apellido, rut, nacimiento, sexo, prevision, telefono, correo, direccion, pais)}
-                                >Ingresar
+                                    onClick={() => listarPacientes()}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-150">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    Mostrar Todos
                                 </button>
-
-                            </div>
-
-                        </div>
-                    </div>
-
-
-                    {/* Search card */}
-                    <div className="bg-white shadow-sm rounded-xl p-6 border border-sky-100">
-                        <h3 className="text-lg font-semibold text-blue-900">Búsqueda de pacientes</h3>
-                        <p className="text-sm text-gray-500 mt-1">Busca por nombre o RUT para evitar duplicados.</p>
-
-                        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-sm font-medium text-gray-700">Buscar por similitud de
-                                    Nombres</label>
-                                <div className="mt-1 flex gap-2">
-                                    <ShadcnInput
-                                        placeholder="Ej: Nicolas Andres .."
-                                        value={nombreBuscado}
-                                        onChange={(e) => setNombreBuscado(e.target.value)}
-                                        className="w-full "
-                                    />
-
-                                    <ShadcnButton
-                                        nombre={"Buscar"}
-                                        funcion={() => buscarNombreSimilar(nombreBuscado)}/>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="text-sm font-medium text-gray-700">Buscar por similitud de RUT</label>
-                                <div className="mt-1 flex gap-2">
-                                    <ShadcnInput
-                                        value={rutBuscado}
-                                        placeholder={"12.345.678-9"}
-                                        onChange={(e) => setRutBuscado(e.target.value)}
-                                        className="w-full "
-                                    />
-
-                                    <ShadcnButton
-                                        nombre={"Buscar"}
-                                        funcion={() => buscarRutSimilar(rutBuscado)}/>
-                                </div>
                             </div>
                         </div>
 
-                    </div>
-
-
-                    {/* Table card */}
-                    <div className="bg-white shadow-sm rounded-xl p-6 border border-sky-100 overflow-x-auto">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-gray-800">Listado de Pacientes</h3>
-                            <div className="text-sm text-gray-500">Total: <span
-                                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-800">{pacientesParaRenderizarEnTabla.length}</span>
-                            </div>
-                        </div>
-
-                        <div className="mb-4">
-                            <button onClick={() => listarPacientes()}
-                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-900 text-white text-sm font-medium hover:bg-blue-800">
-                                Mostrar Todos
-                            </button>
-                        </div>
-
-                        <Table>
-                            <TableCaption className="font-semibold text-sky-700">Listado de Pacientes
-                                Ingresados</TableCaption>
-                            <TableHeader>
-                                <TableRow className="bg-blue-900">
-                                    <TableHead className="w-[120px] text-left font-bold text-white px-3 py-2">Ver
-                                        Datos</TableHead>
-                                    <TableHead
-                                        className="w-[120px] text-left font-bold text-white px-3 py-2">Nombre</TableHead>
-                                    <TableHead className="text-left font-bold text-white px-3 py-2">Apellido</TableHead>
-                                    <TableHead className="text-left font-bold text-white px-3 py-2">RUT</TableHead>
-                                    <TableHead
-                                        className="text-right font-bold text-white px-3 py-2">Telefono</TableHead>
-                                    <TableHead className="text-right font-bold text-white px-3 py-2">Correo</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {pacientesParaRenderizarEnTabla.map((paciente, i) => (
-                                    <TableRow key={paciente.id_paciente}
-                                              className={"hover:bg-slate-50 " + (i % 2 === 0 ? 'bg-white' : 'bg-slate-50')}>
-                                        <TableCell className="font-medium text-gray-800 text-left px-3 py-2">
-                                            <button onClick={() => verDetallePaciente(paciente.id_paciente)}>
-                                                <UserIcon className="w-5 h-5 text-blue-900 hover:text-blue-700"/>
-                                            </button>
-                                        </TableCell>
-                                        <TableCell
-                                            className="font-medium text-gray-800 text-left px-3 py-2">{paciente.nombre}</TableCell>
-                                        <TableCell
-                                            className="text-gray-600 text-left px-3 py-2">{paciente.apellido}</TableCell>
-                                        <TableCell
-                                            className="text-gray-600 text-left px-3 py-2">{paciente.rut}</TableCell>
-                                        <TableCell
-                                            className="text-right text-gray-600 px-3 py-2">{paciente.telefono}</TableCell>
-                                        <TableCell
-                                            className="text-right text-gray-600 px-3 py-2">{paciente.correo}</TableCell>
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableCaption className="font-medium text-slate-400 text-xs py-4">Listado de pacientes registrados en el sistema</TableCaption>
+                                <TableHeader>
+                                    <TableRow className="bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-600 hover:to-cyan-500">
+                                        <TableHead className="w-[80px] text-center font-semibold text-white text-xs uppercase tracking-wider px-3 py-3">Ver</TableHead>
+                                        <TableHead className="text-left font-semibold text-white text-xs uppercase tracking-wider px-3 py-3">Nombre</TableHead>
+                                        <TableHead className="text-left font-semibold text-white text-xs uppercase tracking-wider px-3 py-3">Apellido</TableHead>
+                                        <TableHead className="text-left font-semibold text-white text-xs uppercase tracking-wider px-3 py-3">RUT</TableHead>
+                                        <TableHead className="text-right font-semibold text-white text-xs uppercase tracking-wider px-3 py-3">Teléfono</TableHead>
+                                        <TableHead className="text-right font-semibold text-white text-xs uppercase tracking-wider px-3 py-3">Correo</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-
-                        </Table>
-
+                                </TableHeader>
+                                <TableBody>
+                                    {listaPacientes.map((paciente, i) => (
+                                        <TableRow
+                                            key={paciente.id_paciente}
+                                            className={"hover:bg-sky-50/50 transition-colors duration-100 " + (i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50')}>
+                                            <TableCell className="text-center px-3 py-2.5">
+                                                <button
+                                                    onClick={() => verDetallePaciente(paciente.id_paciente)}
+                                                    className="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-sky-50 border border-sky-100 text-sky-600 hover:bg-sky-100 hover:text-sky-700 transition-colors duration-150">
+                                                    <UserIcon className="w-4 h-4"/>
+                                                </button>
+                                            </TableCell>
+                                            <TableCell className="font-medium text-slate-800 text-sm px-3 py-2.5">{paciente.nombre}</TableCell>
+                                            <TableCell className="text-slate-600 text-sm px-3 py-2.5">{paciente.apellido}</TableCell>
+                                            <TableCell className="text-slate-600 text-sm px-3 py-2.5 font-mono">{paciente.rut}</TableCell>
+                                            <TableCell className="text-right text-slate-600 text-sm px-3 py-2.5">{paciente.telefono}</TableCell>
+                                            <TableCell className="text-right text-slate-500 text-sm px-3 py-2.5">{paciente.correo}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </div>
 
                 </div>
-
             </div>
         </div>
     )

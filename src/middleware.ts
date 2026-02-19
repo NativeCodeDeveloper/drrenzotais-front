@@ -10,6 +10,7 @@ return NextResponse.next()
 }
 
 // (Opcional) Indica en qué rutas se ejecuta
+// (Opcional) Indica en qué rutas se ejecuta
 export const config = {
 matcher: ['/dashboard/:path*'], // o simplemente [] si quieres que no aplique a ninguna
 }

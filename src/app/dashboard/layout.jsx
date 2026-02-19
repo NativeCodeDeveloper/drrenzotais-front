@@ -1,5 +1,6 @@
 // app/dashboard/layout.jsx
 import Link from "next/link";
+import MobileNav from "./MobileNav";
 
 export const metadata = {
     title: "Dashboard",
@@ -8,7 +9,7 @@ export const metadata = {
 
 export default function DashboardLayout({ children }) {
     return (
-        <div className="h-screen w-full overflow-hidden bg-slate-50">
+        <div className="h-screen w-full overflow-hidden bg-white">
             <div className="flex h-full w-full">
                 {/* Sidebar */}
                 <aside className="hidden md:flex h-screen w-[272px] shrink-0 flex-col bg-[#0c111d] text-white border-r border-white/[0.06] selection:bg-cyan-500/30">
@@ -17,11 +18,11 @@ export default function DashboardLayout({ children }) {
                     <div className="relative px-6 py-5 shrink-0">
                         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none" />
                         <div className="relative flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 shadow-[0_0_20px_rgba(34,211,238,0.25)]">
-                                <span className="text-[13px] font-bold text-white leading-none">SC</span>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-400 to-blue-900 shadow-[0_0_20px_rgba(34,211,238,0.25)]">
+                                <span className="text-[13px] font-bold text-white leading-none">A.C</span>
                             </div>
                             <div className="leading-none">
-                                <div className="text-[13px] font-semibold tracking-[-0.01em] text-white">Silueta Chic</div>
+                                <div className="text-[13px] font-semibold tracking-[-0.01em] text-white">AgendaClinica</div>
                                 <div className="mt-0.5 text-[10px] font-medium text-white/40">Panel Administrador</div>
                             </div>
                         </div>
@@ -87,7 +88,7 @@ export default function DashboardLayout({ children }) {
                             {/* — Fichas Clínicas — */}
                             <details className="group">
                                 <summary className="flex items-center justify-between rounded-lg px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/40 hover:text-white/60 transition-colors duration-150 cursor-pointer list-none select-none mt-3">
-                                    <span>Fichas Clinicas</span>
+                                    <span>Registros Clinicos</span>
                                     <svg className="h-3.5 w-3.5 text-white/25 transition-transform duration-200 group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor">
                                         <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
                                     </svg>
@@ -98,15 +99,17 @@ export default function DashboardLayout({ children }) {
                                         className="group/link flex items-center gap-2.5 rounded-lg px-3 py-[7px] text-[13px] font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all duration-150"
                                     >
                                         <span className="h-1 w-1 rounded-full bg-white/20 group-hover/link:bg-cyan-400 group-hover/link:shadow-[0_0_6px_rgba(34,211,238,0.5)] transition-all duration-150" />
-                                        Ingreso Pacientes en sistema
+                                        Ingreso de Pacientes
                                     </Link>
+
                                     <Link
                                         href="/dashboard/FichaClinica"
                                         className="group/link flex items-center gap-2.5 rounded-lg px-3 py-[7px] text-[13px] font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all duration-150"
                                     >
                                         <span className="h-1 w-1 rounded-full bg-white/20 group-hover/link:bg-cyan-400 group-hover/link:shadow-[0_0_6px_rgba(34,211,238,0.5)] transition-all duration-150" />
-                                        Fichas Clinicas
+                                        Carpeta del paciente
                                     </Link>
+
                                 </div>
                             </details>
 
@@ -133,10 +136,14 @@ export default function DashboardLayout({ children }) {
                                         <span className="h-1 w-1 rounded-full bg-white/20 group-hover/link:bg-cyan-400 group-hover/link:shadow-[0_0_6px_rgba(34,211,238,0.5)] transition-all duration-150" />
                                         Carrusel de Portada
                                     </Link>
+
+
+
+
                                 </div>
                             </details>
 
-                            {/* — Productos y Servicios — */}
+
                             <details className="group">
                                 <summary className="flex items-center justify-between rounded-lg px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/40 hover:text-white/60 transition-colors duration-150 cursor-pointer list-none select-none mt-3">
                                     <span>Productos y Servicios</span>
@@ -145,20 +152,18 @@ export default function DashboardLayout({ children }) {
                                     </svg>
                                 </summary>
                                 <div className="mt-1 ml-3 space-y-0.5 border-l border-white/[0.06] pl-3">
+
+
+
                                     <Link
                                         href="/dashboard/ingresoProductos"
                                         className="group/link flex items-center gap-2.5 rounded-lg px-3 py-[7px] text-[13px] font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all duration-150"
                                     >
                                         <span className="h-1 w-1 rounded-full bg-white/20 group-hover/link:bg-cyan-400 group-hover/link:shadow-[0_0_6px_rgba(34,211,238,0.5)] transition-all duration-150" />
-                                        Productos / Servicios
+                                        Tratamientos y Servicios
                                     </Link>
-                                    <Link
-                                        href="/dashboard/cupones"
-                                        className="group/link flex items-center gap-2.5 rounded-lg px-3 py-[7px] text-[13px] font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all duration-150"
-                                    >
-                                        <span className="h-1 w-1 rounded-full bg-white/20 group-hover/link:bg-cyan-400 group-hover/link:shadow-[0_0_6px_rgba(34,211,238,0.5)] transition-all duration-150" />
-                                        Cupones Descuentos
-                                    </Link>
+
+
                                     <Link
                                         href="/dashboard/categoriasProductos"
                                         className="group/link flex items-center gap-2.5 rounded-lg px-3 py-[7px] text-[13px] font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all duration-150"
@@ -169,8 +174,60 @@ export default function DashboardLayout({ children }) {
                                 </div>
                             </details>
 
-                            {/* — Ventas Online — */}
+
+
                             <details className="group">
+                                <summary className="flex items-center justify-between rounded-lg px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/40 hover:text-white/60 transition-colors duration-150 cursor-pointer list-none select-none mt-3">
+                                    <span>Cobro por Consulta</span>
+                                    <svg className="h-3.5 w-3.5 text-white/25 transition-transform duration-200 group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
+                                    </svg>
+                                </summary>
+                                <div className="mt-1 ml-3 space-y-0.5 border-l border-white/[0.06] pl-3">
+
+
+
+                                    <Link
+                                        href="/dashboard/profesionales"
+                                        className="group/link flex items-center gap-2.5 rounded-lg px-3 py-[7px] text-[13px] font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all duration-150"
+                                    >
+                                        <span className="h-1 w-1 rounded-full bg-white/20 group-hover/link:bg-cyan-400 group-hover/link:shadow-[0_0_6px_rgba(34,211,238,0.5)] transition-all duration-150" />
+                                        Registro de Profesionales
+                                    </Link>
+
+
+
+                                    <Link
+                                        href="/dashboard/serviciosAgendamiento"
+                                        className="group/link flex items-center gap-2.5 rounded-lg px-3 py-[7px] text-[13px] font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all duration-150"
+                                    >
+                                        <span className="h-1 w-1 rounded-full bg-white/20 group-hover/link:bg-cyan-400 group-hover/link:shadow-[0_0_6px_rgba(34,211,238,0.5)] transition-all duration-150" />
+                                        Prestaciones en Agenda
+                                    </Link>
+
+
+
+                                    <Link
+                                        href="/dashboard/tarifaServicio"
+                                        className="group/link flex items-center gap-2.5 rounded-lg px-3 py-[7px] text-[13px] font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all duration-150"
+                                    >
+                                        <span className="h-1 w-1 rounded-full bg-white/20 group-hover/link:bg-cyan-400 group-hover/link:shadow-[0_0_6px_rgba(34,211,238,0.5)] transition-all duration-150" />
+                                        Cobro por Consulta
+                                    </Link>
+
+
+
+                                </div>
+                            </details>
+
+
+
+
+
+
+                            {/*
+
+                              <details className="group">
                                 <summary className="flex items-center justify-between rounded-lg px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/40 hover:text-white/60 transition-colors duration-150 cursor-pointer list-none select-none mt-3">
                                     <span>Ventas Online</span>
                                     <svg className="h-3.5 w-3.5 text-white/25 transition-transform duration-200 group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor">
@@ -185,8 +242,14 @@ export default function DashboardLayout({ children }) {
                                         <span className="h-1 w-1 rounded-full bg-white/20 group-hover/link:bg-cyan-400 group-hover/link:shadow-[0_0_6px_rgba(34,211,238,0.5)] transition-all duration-150" />
                                         Compras en Linea
                                     </Link>
+
+
+
                                 </div>
                             </details>
+
+                             */}
+
 
                         </div>
 
@@ -229,30 +292,7 @@ export default function DashboardLayout({ children }) {
 
                 {/* Content */}
                 <div className="flex-1 min-w-0 h-full overflow-y-auto">
-                    {/* Mobile top bar */}
-                    <div className="md:hidden sticky top-0 z-40 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl">
-                        <div className="px-4 py-3 flex items-center justify-between">
-                            <div className="flex items-center gap-2.5">
-                                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-cyan-400 to-blue-500">
-                                    <span className="text-[10px] font-bold text-white leading-none">SC</span>
-                                </div>
-                                <span className="text-sm font-semibold text-slate-900">Silueta Chic</span>
-                            </div>
-                            <div className="text-[11px] font-medium text-slate-400">Dashboard</div>
-                        </div>
-                        <div className="px-4 pb-3 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                            <div className="flex gap-1.5 w-max">
-                                <Link href="/dashboard" className="text-[11px] font-medium px-3 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all whitespace-nowrap">Inicio</Link>
-                                <Link href="/dashboard/pedidosCompras" className="text-[11px] font-medium px-3 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all whitespace-nowrap">Pedidos</Link>
-                                <Link href="/dashboard/ingresoProductos" className="text-[11px] font-medium px-3 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all whitespace-nowrap">Productos</Link>
-                                <Link href="/dashboard/cupones" className="text-[11px] font-medium px-3 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all whitespace-nowrap">Cupones</Link>
-                                <Link href="/dashboard/calendario" className="text-[11px] font-medium px-3 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all whitespace-nowrap">Agenda</Link>
-                                <Link href="/dashboard/agendaCitas" className="text-[11px] font-medium px-3 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all whitespace-nowrap">Citas</Link>
-                                <Link href="/dashboard/categoriasProductos" className="text-[11px] font-medium px-3 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all whitespace-nowrap">Categorías</Link>
-                                <Link href="/dashboard/publicaciones" className="text-[11px] font-medium px-3 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all whitespace-nowrap">Publicaciones</Link>
-                            </div>
-                        </div>
-                    </div>
+                    <MobileNav />
 
                     <main className="min-w-0">
                         {children}

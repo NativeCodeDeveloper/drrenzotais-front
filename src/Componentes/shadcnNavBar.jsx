@@ -55,7 +55,7 @@ export function ShadcnNavBar() {
 
         <div className="flex items-center gap-3">
           <Link
-            href="/contacto"
+            href="/AgendaProceso"
             className="hidden rounded-full bg-slate-900 px-7 py-3 text-sm font-medium text-white transition hover:bg-slate-700 sm:inline-flex"
           >
             Agendar cita

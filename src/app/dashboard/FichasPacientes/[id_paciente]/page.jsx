@@ -28,13 +28,10 @@ export default function Paciente() {
         router.push(`/dashboard/NuevaFicha/${id_paciente}`);
     }
 
-
     function editarFichaClinica(id_ficha) {
         router.push(`/dashboard/EdicionFicha/${id_ficha}`);
     }
 
-
-    //PARAMETROS USESTATE PARA INSERCION DE DATOS EN PACIENTES
     const [nombre, setNombre] = useState("");
     const [apellido, setApellido] = useState("");
     const [rut, setRut] = useState("");
@@ -46,12 +43,8 @@ export default function Paciente() {
     const [direccion, setDireccion] = useState("");
     const [pais, setPais] = useState("");
 
-
-
     const [checked, setChecked] = useState(true);
 
-
-    //USESTATES PARA MANIPULAR DATOS DE LA FICHACLINICA
     const [tipoAtencion, setTipoAtencion] = useState("");
     const [motivoConsulta, setMotivoConsulta] = useState("");
     const [signosVitales, setSignosVitales] = useState("");
@@ -65,12 +58,8 @@ export default function Paciente() {
     const [estadoFicha, setEstadoFicha] = useState("");
     const [consentimientoFirmado, setConsentimientoFirmado] = useState("");
 
-
-    //PARAMETROS PARA LISTAR FICHAS CLINICAS
     const [listaFichas, setListaFichas] = useState([]);
 
-
-    //FUNCION PARA LA ELIMINACION LOGICA DE UNA FICHA CLINICA
     async function eliminarFicha(id_ficha) {
         try {
             if (!id_ficha) {
@@ -90,11 +79,8 @@ export default function Paciente() {
 
             if (!res.ok) {
                 return toast.error("No se puedo eliminar la ficha , contacte a soporte informatico");
-
             } else {
-
                 const resultadoBackend = await res.json();
-
                 if (resultadoBackend.message === true) {
                     await listarFichasClinicasPaciente(id_paciente)
                     return toast.success("Se ha eliminado la ficha con exito!")
@@ -107,13 +93,11 @@ export default function Paciente() {
         }
     }
 
-    //FUNCION PARA LISTAR LAS FICHAS CLINICAS POR ID DE PACIENTE
     async function listarFichasClinicasPaciente(id_paciente) {
         try {
             if (!id_paciente) {
                 return toast.error("No se ha seleccionado ningun Id, si el problema persiste contcate a soporte de Medify")
             } else {
-
                 const res = await fetch(`${API}/ficha/seleccionarFichasPaciente`, {
                     method: "POST",
                     headers: {
@@ -123,7 +107,6 @@ export default function Paciente() {
                     body: JSON.stringify({id_paciente}),
                     mode: "cors"
                 })
-
 
                 if (!res.ok) {
                     return toast.error("Ha ocurrido un error Contacte a soporte de Medify")
@@ -136,17 +119,12 @@ export default function Paciente() {
             console.log(e)
             return toast.error("Ha ocurrido un error en el servidor: " + e)
         }
-
     }
 
-
-    //FUNCION QUE PERMITE NAVEGAR ENTRE PAGINAS Y VOLVER A LA FECHA CLINCA CON USEROUTER
     function volverAFichas() {
         router.push("/dashboard/FichaClinica");
     }
 
-
-    //FUNCION PARA LA ACTUALIZACION DE DATOS DEL PACIENTE
     async function actualizarDatosPacientes(nombre, apellido, rut, nacimiento, sexo, prevision, telefono, correo, direccion, pais, id_paciente) {
 
         let prevision_id = null;
@@ -212,7 +190,6 @@ export default function Paciente() {
         }
     }
 
-
     async function buscarPacientePorId(id_paciente) {
         try {
             if (!id_paciente) {
@@ -232,352 +209,239 @@ export default function Paciente() {
             }
 
             const dataPaciente = await res.json();
-            // Asegurar que siempre guardamos un array para poder mapear sin errores
             setDetallePaciente(Array.isArray(dataPaciente) ? dataPaciente : [dataPaciente]);
 
         } catch (error) {
             console.log(error);
             return toast.error("No se puede cargar los datos del paciente seleccionado. Por favor contacte a soporte de Medify");
-
         }
     }
 
-    // Ejecutar la búsqueda cuando cambie id_paciente (Next puede resolver el param después del primer render)
     useEffect(() => {
         if (!id_paciente) return;
         buscarPacientePorId(id_paciente)
     }, [id_paciente]);
 
+    function calcularEdad(fechaNacimiento) {
+        if (!fechaNacimiento) return '-';
+        const hoy = new Date();
+        const nacimiento = new Date(fechaNacimiento);
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const mes = hoy.getMonth() - nacimiento.getMonth();
+        if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+            edad--;
+        }
+        return edad;
+    }
 
     function previsionDeterminacion(id_prevision) {
-        let previsionString = null;
-
-        if (id_prevision === 1) {
-            previsionString = "NO APLICA"
-        } else if (id_prevision === 2) {
-            previsionString = "NO APLICA"
-        } else {
-            previsionString = "SIN DEFINIR"
-        }
-        return previsionString;
+        if (id_prevision === 1) return "NO APLICA";
+        if (id_prevision === 2) return "NO APLICA";
+        return "SIN DEFINIR";
     }
 
     return (
-        <div>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50/30">
             <ToasterClient/>
 
-            {/*PANTALLAS MOVILES*/}
-            <div className="block md:hidden min-h-screen bg-gradient-to-b from-sky-50 via-white to-white py-10">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
 
-                <div className="max-w-5xl mx-auto px-4">
-                    <header className="mb-6">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                            <div>
-                                <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900">Historial
-                                    Clínico</h1>
-                                <p className="mt-1 text-sm text-slate-500">Detalle y fichas del paciente</p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="hidden sm:flex items-center gap-3">
-                                    <span className="text-xs text-slate-500">Registros:</span>
-                                    <span
-                                        className="inline-flex items-center px-3 py-1 rounded-full bg-sky-100 text-sky-800 font-medium text-sm">{detallePaciente.length}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <ShadcnButton className="text-base" nombre={"Volver a Fichas Clinicas"}
-                                                  funcion={() => volverAFichas()}/>
-                                </div>
-                            </div>
-                        </div>
-                    </header>
-
-                    {/* CONTENEDOR CON INFORMACION DEL PACIENTE */}
-                    <div className="mb-6">
-                        {detallePaciente.length === 0 ? (
-
-                            <div
-                                className="rounded-lg border border-dashed border-slate-200 bg-white p-6 text-center text-sm text-slate-500 shadow-sm">No
-                                hay datos disponibles o se están cargando...</div>
-                        ) : (
-                            detallePaciente.map(paciente => (
-                                <article key={paciente.id_paciente}
-                                         className="bg-white rounded-2xl shadow-lg border border-sky-50 overflow-hidden">
-                                    <div className="p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
-                                        <div className="sm:col-span-2">
-                                            <div className="flex items-start justify-between">
-                                                <div>
-
-                                                    <span> PREVISIÓN : </span>
-                                                    <span
-                                                        className="inline-flex items-center p-2 mr-2 rounded-full text-xs font-medium bg-sky-100 text-sky-800"> Previsión : {previsionDeterminacion(paciente.prevision_id)}</span>
-
-                                                    <h2 className="text-base mt-5 font-semibold text-slate-900">{paciente.nombre} {paciente.apellido}</h2>
-                                                    <p className="mt-1 text-xs text-slate-500">RUT: <span
-                                                        className="font-medium text-slate-700">{paciente.rut}</span></p>
-                                                </div>
-                                                <div className="text-right">
-                                                </div>
-                                            </div>
-
-                                            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                <div className="bg-slate-50 p-3 rounded-md">
-                                                    <p className="text-xs text-slate-500">Fecha de nacimiento</p>
-                                                    <p className="mt-1 text-xs font-medium text-slate-700">{formatearFecha(paciente.nacimiento)}</p>
-                                                </div>
-
-                                                <div className="bg-slate-50 p-3 rounded-md">
-                                                    <p className="text-xs text-slate-500">Sexo</p>
-                                                    <p className="mt-1 text-xs font-medium text-slate-700">{paciente.sexo}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="sm:col-span-1">
-                                            <div className="flex flex-col gap-3">
-                                                <div className=" bg-slate-50 p-3 rounded-md">
-                                                    <p className="text-xs text-slate-500">Teléfono</p>
-                                                    <p className="mt-1  text-xs font-medium text-slate-700">{paciente.telefono || '-'}</p>
-                                                </div>
-                                                <div className="text-sm bg-slate-50 p-3 rounded-md">
-                                                    <p className="text-xs text-slate-500">Correo</p>
-                                                    <p className="mt-1 text-xs font-medium text-slate-700 break-all">{paciente.correo || '-'}</p>
-                                                </div>
-                                                <div className="text-xs bg-slate-50 p-3 rounded-md">
-                                                    <p className="text-xs text-slate-500">Dirección</p>
-                                                    <p className="mt-1 text-xs font-medium text-slate-700">{paciente.direccion || '-'}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </article>
-                            ))
-                        )}
+                {/* Header */}
+                <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <p className="text-xs font-semibold uppercase tracking-widest text-sky-600 mb-1">Historial del paciente</p>
+                        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
+                            Carpeta Clinica de :
+                        </h1>
                     </div>
-
-                    {/*BOTONES VER FICHAS Y NUEVA FICHA*/}
-                    <div className="mt-4 flex justify gap-4">
-                        <ShadcnButton nombre={"Ver Fichas"} funcion={() => listarFichasClinicasPaciente(id_paciente)}/>
-
-                        <ShadcnButton nombre={"Nueva Ficha"} funcion={() => nuevaFichaClinica(id_paciente)}/>
-
-
+                    <div className="flex items-center gap-2">
+                        <InfoButton informacion={'En este apartado se mostrarán las fichas clínicas del paciente, ordenadas desde la más reciente a la más antigua, incluyendo tanto las fichas como sus anotaciones asociadas.\n\nPara editar una ficha clínica, debe seleccionarse el botón Editar, lo que lo llevará al formulario correspondiente donde podrá modificar la información de la ficha seleccionada.\n\nEn caso de eliminar una ficha clínica, deberá presionar el botón Eliminar. Esta acción removerá la ficha seleccionada del sistema.\n\nSi desea crear una nueva ficha clínica, debe seleccionar el botón Nueva Ficha, el cual lo dirigirá al formulario de ingreso para registrar una nueva ficha clínica.'}/>
+                        <button
+                            onClick={() => volverAFichas()}
+                            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all duration-150 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                            Volver
+                        </button>
                     </div>
-                    {/* Fichas Listado envuelto en contenedores div */}
-                    <section className="mt-8 grid grid-cols-1 gap-4">
-                        {listaFichas.length === 0 ? (
-                            <div className="text-center text-sm text-slate-500">No hay fichas cargadas para este
-                                paciente.</div>
-                        ) : (
-                            listaFichas.map((ficha) => (
-                                <article key={ficha.id_ficha}
-                                         className="bg-white border border-sky-50 shadow-sm rounded-2xl p-5 sm:p-6">
-                                    <div className="flex items-start justify-between">
-                                        <div>
-                                            <h3 className="text-base font-semibold text-slate-900">Ficha
-                                                #{ficha.id_ficha}</h3>
-                                            <p className="mt-1 text-sm text-slate-500">{formatearFecha(ficha.fechaConsulta)}</p>
-                                        </div>
-                                        <div className="text-right">
-
-
-                                        </div>
-                                    </div>
-
-
-                                    <div className="mt-4 grid grid-cols-1 gap-4">
-                                        <div className="space-y-3">
-                                            <div>
-                                                <p className="text-xs text-slate-500">Anotacion General de Consulta</p>
-                                                <p className="mt-1 text-xs text-slate-700 whitespace-pre-line">{ficha.anotacionConsulta || '-'}</p>
-                                                <br/>
-
-                                            </div>
-
-                                            <div className="flex gap-2">
-                                                <ShadcnButton
-                                                    funcion={() => editarFichaClinica(ficha.id_ficha)}
-                                                    nombre={"Editar"}/>
-
-                                                <ShadcnButton
-                                                    funcion={() => eliminarFicha(ficha.id_ficha)}
-                                                    nombre={"Eliminar"}/>
-                                            </div>
-
-                                        </div>
-
-
-                                    </div>
-                                </article>
-                            ))
-                        )}
-                    </section>
-
                 </div>
 
-            </div>
+                {/* Tarjeta paciente */}
+                {detallePaciente.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-400 shadow-sm">
+                        Cargando datos del paciente...
+                    </div>
+                ) : (
+                    detallePaciente.map(paciente => (
+                        <div key={paciente.id_paciente} className="mb-8 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                            <div className="bg-gradient-to-r from-sky-600 to-cyan-500 px-5 md:px-6 py-3.5 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-9 w-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                                        <span className="text-sm font-bold text-white">
+                                            {paciente.nombre?.charAt(0)}{paciente.apellido?.charAt(0)}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-white tracking-tight">
+                                            {paciente.nombre} {paciente.apellido}
+                                        </h2>
+                                        <p className="text-base text-sky-100">RUT: {paciente.rut}</p>
+                                    </div>
+                                </div>
+                                <span className="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white backdrop-blur-sm">
+                                   Prevision : {previsionDeterminacion(paciente.prevision_id)}
+                                </span>
+                            </div>
 
+                            <div className="p-5 md:p-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                                <div className="bg-slate-50 rounded-lg px-4 py-3">
+                                    <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Nacimiento</p>
+                                    <p className="text-sm font-medium text-slate-700 mt-1">{formatearFecha(paciente.nacimiento)}</p>
+                                </div>
+                                <div className="bg-sky-50 rounded-lg px-4 py-3 border border-sky-100">
+                                    <p className="text-[11px] font-medium text-sky-400 uppercase tracking-wider">Edad</p>
+                                    <p className="text-sm font-bold text-sky-700 mt-1">{calcularEdad(paciente.nacimiento)} años</p>
+                                </div>
+                                <div className="bg-slate-50 rounded-lg px-4 py-3">
+                                    <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Sexo</p>
+                                    <p className="text-sm font-medium text-slate-700 mt-1">{paciente.sexo}</p>
+                                </div>
+                                <div className="bg-slate-50 rounded-lg px-4 py-3">
+                                    <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Teléfono</p>
+                                    <p className="text-sm font-medium text-slate-700 mt-1">{paciente.telefono || '-'}</p>
+                                </div>
+                                <div className="bg-slate-50 rounded-lg px-4 py-3">
+                                    <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Correo</p>
+                                    <p className="text-sm font-medium text-slate-700 mt-1 truncate">{paciente.correo || '-'}</p>
+                                </div>
+                                <div className="bg-slate-50 rounded-lg px-4 py-3 col-span-2 sm:col-span-1">
+                                    <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Dirección</p>
+                                    <p className="text-sm font-medium text-slate-700 mt-1">{paciente.direccion || '-'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
 
-            {/*PANTALLAS ESCRITORIO*/}
-            <div className="hidden md:block min-h-screen bg-gradient-to-b from-sky-50 via-white to-white py-10">
-                <div className="max-w-5xl mx-auto px-4 flex justify-end">
-                    <InfoButton informacion={'En este apartado se mostrarán las fichas clínicas del paciente, ordenadas desde la más reciente a la más antigua, incluyendo tanto las fichas como sus anotaciones asociadas.\n' +
-                        '\n' +
-                        'Para editar una ficha clínica, debe seleccionarse el botón Editar, lo que lo llevará al formulario correspondiente donde podrá modificar la información de la ficha seleccionada.\n' +
-                        '\n' +
-                        'En caso de eliminar una ficha clínica, deberá presionar el botón Eliminar. Esta acción removerá la ficha seleccionada del sistema.\n' +
-                        '\n' +
-                        'Si desea crear una nueva ficha clínica, debe seleccionar el botón Nueva Ficha, el cual lo dirigirá al formulario de ingreso para registrar una nueva ficha clínica.'} />
+                {/* Barra de acciones */}
+                <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl px-5 py-3.5 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <span className="text-2xl text-green-800 font-bold">Fichas registradas</span>
+                        <span className="inline-flex items-center justify-center h-8 min-w-[24px] px-2 rounded-full text-base font-bold bg-green-100 text-green-700">
+                            {listaFichas.length}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => listarFichasClinicasPaciente(id_paciente)}
+                            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition-all duration-150">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            Cargar Fichas
+                        </button>
+                        <button
+                            onClick={() => nuevaFichaClinica(id_paciente)}
+                            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-sky-600 to-cyan-500 rounded-lg hover:from-sky-700 hover:to-cyan-600 transition-all duration-150 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Nueva Ficha
+                        </button>
+                    </div>
                 </div>
 
-                <div className="max-w-5xl mx-auto px-4">
-                    <header className="mb-6">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                            <div>
-                                <h1 className="text-5xl  font-extrabold text-gray-800">Historial
-                                    Clínico</h1>
-                                <p className="mt-1 text-sm text-slate-500">Detalle y fichas del paciente</p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="hidden sm:flex items-center gap-3">
-                                    <span className="text-xs text-slate-500">Registros:</span>
-                                    <span
-                                        className="inline-flex items-center px-3 py-1 rounded-full bg-sky-100 text-sky-800 font-medium text-sm">{detallePaciente.length}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <ShadcnButton nombre={"Volver a Fichas Clinicas"} funcion={() => volverAFichas()}/>
-                                </div>
-                            </div>
+                {/* Listado de fichas */}
+                <div className="space-y-4">
+                    {listaFichas.length === 0 ? (
+                        <div className="rounded-xl border border-dashed border-slate-200 bg-white py-16 text-center shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-slate-200 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <p className="text-sm font-medium text-slate-400">No hay fichas cargadas</p>
+                            <p className="text-xs text-slate-300 mt-1">Presione "Cargar Fichas" para visualizar el historial</p>
                         </div>
-                    </header>
+                    ) : (
+                        listaFichas.map((ficha) => (
+                            <div key={ficha.id_ficha} className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
 
-                    {/* CONTENEDOR CON INFORMACION DEL PACIENTE */}
-                    <div className="mb-6">
-                        {detallePaciente.length === 0 ? (
-                            <div
-                                className="rounded-lg border border-dashed border-slate-200 bg-white p-6 text-center text-sm text-slate-500 shadow-sm">No
-                                hay datos disponibles o se están cargando...</div>
-                        ) : (
-                            detallePaciente.map(paciente => (
-                                <article key={paciente.id_paciente}
-                                         className="bg-white rounded-2xl shadow-lg border border-sky-50 overflow-hidden">
-                                    <div className="p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
-                                        <div className="sm:col-span-2">
-                                            <div className="flex items-start justify-between">
-                                                <div>
-                                                    <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">{paciente.nombre} {paciente.apellido}</h2>
-                                                    <p className="mt-1 text-sm text-slate-500">RUT: <span
-                                                        className="font-medium text-slate-700">{paciente.rut}</span></p>
-                                                </div>
-                                                <div className="text-right">
-                                                <span
-                                                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-sky-100 text-sky-800">Previsión : {previsionDeterminacion(paciente.prevision_id)}</span>
-                                                </div>
+                                {/* Cabecera ficha */}
+                                <div className="flex flex-col gap-2 px-5 md:px-6 py-3.5 border-b border-slate-100 bg-slate-50/60">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-sky-100 text-sky-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                </svg>
                                             </div>
-
-                                            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                <div className="bg-slate-50 p-3 rounded-md">
-                                                    <p className="text-xs text-slate-500">Fecha de nacimiento</p>
-                                                    <p className="mt-1 font-medium text-slate-700">{formatearFecha(paciente.nacimiento)}</p>
-                                                </div>
-                                                <div className="bg-slate-50 p-3 rounded-md">
-                                                    <p className="text-xs text-slate-500">Sexo</p>
-                                                    <p className="mt-1 font-medium text-slate-700">{paciente.sexo}</p>
-                                                </div>
+                                            <div className="flex items-center gap-2.5">
+                                                <span className="text-base font-semibold text-green-800">Ficha Clinica № {ficha.id_ficha}</span>
+                                                <span className="text-slate-200">|</span>
+                                                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-sky-50 border border-sky-100">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    <span className="text-sm font-semibold text-sky-700">{formatearFecha(ficha.fechaConsulta)}</span>
+                                                </span>
                                             </div>
                                         </div>
-
-                                        <div className="sm:col-span-1">
-                                            <div className="flex flex-col gap-3">
-                                                <div className="text-sm bg-slate-50 p-3 rounded-md">
-                                                    <p className="text-xs text-slate-500">Teléfono</p>
-                                                    <p className="mt-1 font-medium text-slate-700">{paciente.telefono || '-'}</p>
-                                                </div>
-                                                <div className="text-sm bg-slate-50 p-3 rounded-md">
-                                                    <p className="text-xs text-slate-500">Correo</p>
-                                                    <p className="mt-1 font-medium text-slate-700 break-all">{paciente.correo || '-'}</p>
-                                                </div>
-                                                <div className="text-sm bg-slate-50 p-3 rounded-md">
-                                                    <p className="text-xs text-slate-500">Dirección</p>
-                                                    <p className="mt-1 font-medium text-slate-700">{paciente.direccion || '-'}</p>
-                                                </div>
-                                            </div>
+                                        <div className="flex items-center gap-2 ml-11 sm:ml-0">
+                                        <button
+                                            onClick={() => editarFichaClinica(ficha.id_ficha)}
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-sky-700 bg-sky-50 border border-sky-200 rounded-lg hover:bg-sky-100 transition-colors duration-150">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                            Editar
+                                        </button>
+                                        <button
+                                            onClick={() => eliminarFicha(ficha.id_ficha)}
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors duration-150">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                            Eliminar
+                                        </button>
                                         </div>
                                     </div>
-                                </article>
-                            ))
-                        )}
-                    </div>
+                                    {/* Chips: Motivo + Profesional */}
+                                    <div className="flex flex-wrap items-center gap-2 ml-11 sm:ml-0">
+                                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-sky-50 border border-sky-100 text-xs font-medium text-sky-700">
+                                            <span className="text-sky-400">Motivo Consulta:</span> {ficha.tipoAtencion || '-'}
+                                        </span>
+                                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-cyan-50 border border-cyan-100 text-xs font-medium text-cyan-700">
+                                            <span className="text-cyan-400">Profesional:</span> {ficha.observaciones || '-'}
+                                        </span>
+                                    </div>
+                                </div>
 
-                    {/*BOTONES VER FICHAS Y NUEVA FICHA*/}
-                    <div className="mt-4 flex justify gap-4">
-                        <ShadcnButton nombre={"Ver Fichas"} funcion={() => listarFichasClinicasPaciente(id_paciente)}/>
+                                {/* Cuerpo ficha */}
+                                <div className="px-5 md:px-6 py-4">
 
-                        <ShadcnButton nombre={"Nueva Ficha"} funcion={() => nuevaFichaClinica(id_paciente)}/>
-
-
-                    </div>
-                    {/* Fichas Listado envuelto en contenedores div */}
-                    <section className="mt-8 grid grid-cols-1 gap-4">
-                        {listaFichas.length === 0 ? (
-                            <div className="text-center text-sm text-slate-500">No hay fichas cargadas para este
-                                paciente.</div>
-                        ) : (
-                            listaFichas.map((ficha) => (
-                                <article key={ficha.id_ficha}
-                                         className="bg-white border border-sky-50 shadow-sm rounded-2xl p-5 sm:p-6">
-                                    <div className="flex items-start justify-between">
-                                        <div>
-                                            <h3 className="text-lg font-semibold text-slate-900">Ficha
-                                                #{ficha.id_ficha}</h3>
-                                            <p className="mt-1 text-sm text-slate-500">{formatearFecha(ficha.fechaConsulta)}</p>
+                                    {/* Diagnóstico e Indicaciones */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                                        <div className="flex flex-col gap-0.5 px-3 py-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Diagnóstico</span>
+                                            <span className="text-sm font-medium text-slate-700">{ficha.diagnostico || '-'}</span>
                                         </div>
-                        <div>
-                            <div className="text-right">
-                                <span className="text-xs text-slate-500">Tipo:</span>
-                                <div
-                                    className="mt-1 inline-flex items-center px-2.5 py-1 rounded-md bg-sky-50 text-sky-700 text-sm font-medium">{ficha.tipoAtencion || '-'}</div>
+                                        <div className="flex flex-col gap-0.5 px-3 py-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Indicaciones</span>
+                                            <span className="text-sm font-medium text-slate-700">{ficha.indicaciones || '-'}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Anotación clínica */}
+                                    <div className="border-t border-slate-100 pt-4">
+                                        <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-2">Anotación Clínica</p>
+                                        <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line bg-slate-50/50 rounded-lg px-4 py-3 border border-slate-100">
+                                            {ficha.anotacionConsulta || 'Sin anotaciones registradas.'}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="text-right">
-                                <span className="text-xs text-slate-500">Valor Sesion: </span>
-                                <div
-                                    className="mt-1 inline-flex items-center px-2.5 py-1 rounded-md bg-sky-50 text-sky-700 text-sm font-medium">{ficha.observaciones || '-'}</div>
-                            </div>
-
-
-                        </div>
-                                    </div>
-
-
-                                    <div className="mt-4 grid grid-cols-1 gap-4">
-                                        <div className="space-y-3">
-                                            <div>
-                                                <p className="text-xs text-slate-500">Anotacion General de Consulta</p>
-                                                <p className="mt-1 text-sm text-slate-700 whitespace-pre-line">{ficha.anotacionConsulta || '-'}</p>
-                                                <br/>
-
-                                            </div>
-
-                                            <div className="flex gap-5">
-
-                                                <ShadcnButton
-                                                    className="w-50"
-                                                    funcion={() => editarFichaClinica(ficha.id_ficha)}
-                                                    nombre={"Editar"}/>
-
-                                                <ShadcnButton
-                                                    funcion={() => eliminarFicha(ficha.id_ficha)}
-                                                    nombre={"Eliminar"}/>
-                                            </div>
-
-                                        </div>
-
-
-                                    </div>
-                                </article>
-                            ))
-                        )}
-                    </section>
-
+                        ))
+                    )}
                 </div>
 
             </div>
