@@ -44,14 +44,15 @@ try {
     if(data.message === true){
         await seleccionarCategorias();
         setdescripcionCategoria("");
-        return toast.success("Categoría actualizada correctamente");
+        setCategoriaSelecionado(null);
+        return toast.success("Categoria actualizada correctamente");
     }else{
-        toast.error("Categoría no se pudo actualizar, contacte a Soporte Informático")
+        toast.error("Categoria no se pudo actualizar, contacte a Soporte Informatico")
     }
 
 }catch (error) {
     console.error(error);
-    return toast.error("Ha ocurrido un error: contacte a Soporte Informático: " + error.message);
+    return toast.error("Ha ocurrido un error: contacte a Soporte Informatico: " + error.message);
 } finally {
     setIsLoading(false);
 }
@@ -75,13 +76,14 @@ async function eliminarCategorias(id_categoriaProducto) {
         const data = await res.json();
         if(data.message === true){
             setdescripcionCategoria("");
+            setCategoriaSelecionado(null);
             await seleccionarCategorias();
-            return toast.success("Categoría eliminada correctamente");
+            return toast.success("Categoria eliminada correctamente");
         }else {
-            return toast.error("No fue posible eliminar la categoría");
+            return toast.error("No fue posible eliminar la categoria");
         }
     }catch(err) {
-        return toast.error("No fue posible eliminar la categoría contacte a soporte informatico de NativeCode");
+        return toast.error("No fue posible eliminar la categoria contacte a soporte informatico de NativeCode");
     } finally {
         setIsLoading(false);
     }
@@ -111,7 +113,7 @@ async function insertarCategoria(event) {
         if (data) {
              setdescripcionCategoria("");
              await seleccionarCategorias();
-             return toast.success("Categoría ingresada correctamente");
+             return toast.success("Categoria ingresada correctamente");
          }
      }catch (error) {
          console.log(error);
@@ -142,8 +144,7 @@ async function seleccionarCategoriaEspecifica(id_categoriaProducto) {
         const data = await res.json();
         setdescripcionCategoria(data.descripcionCategoria);
         setCategoriaSelecionado(data);
-        console.log(data);
-        return toast.success('Se ha seleccionado de manera correcta una categoria para ser editada!')
+        return toast.success('Categoria seleccionada para edicion')
     }catch (e) {
         console.error(e);
     }
@@ -186,210 +187,185 @@ useEffect(() => {
 
 
 return (
-  <div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50/30">
+        <ToasterClient />
 
-      {/*PANTALLAS MOVILES*/}
-      <div className="block md:hidden min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/70 px-4 py-6">
-          <ToasterClient></ToasterClient>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
 
-          <div className="mx-auto max-w-6xl rounded-2xl border border-slate-200/80 bg-white/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm p-5 md:p-8">
+            {/* Header */}
+            <div className="mb-8">
+                <p className="text-xs font-semibold uppercase tracking-widest text-sky-600 mb-1">Administracion</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
+                    Gestion de Categorias
+                </h1>
+                <p className="text-sm text-slate-500 mt-1">Crea, edita y administra las categorias de tus productos.</p>
+            </div>
 
+            <div className="space-y-6">
 
-              {/* CONTENEDOR DEL FORMULARIO DE INGRESO Y EDICION DE  CATEGORIAS*/}
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
-                  <div className="p-5 md:p-6 rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm ring-1 ring-black/5">
-                      <div className="mb-4">
-                        <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-slate-900">Gestión de Categorías</h1>
-                        <p className="text-xs text-slate-500">Crea, edita y administra tus categorías de productos.</p>
-                      </div>
-                      <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600">Nombre de la categoría</label>
-                      <form onSubmit={insertarCategoria}>
-                          <input
-                              type={"text"}
-                              value={descripcionCategoria}
-                              onChange={(event) => setdescripcionCategoria(event.target.value)}
-                              placeholder="Tipo de categoría..."
-                              className="w-full mt-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-slate-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                              disabled={isLoading}
-                          />
-                          <div className="mt-3 flex flex-wrap items-center gap-2">
-                          <button
-                              type="submit"
-                              className="inline-flex items-center justify-center rounded-xl border border-blue-600/80 bg-blue-600/10 px-3 py-2 text-xs font-semibold text-blue-800 shadow-sm hover:bg-blue-600/20 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-blue-100 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                          >
-                              Ingresar
-                          </button>
-                          {categoriaSelecionado &&(
-                              <button
-                                  onClick={()=> actualizarCategoria(categoriaSelecionado.id_categoriaProducto, descripcionCategoria)}
-                                  type="button"
-                                  disabled={isLoading}
-                                  className="inline-flex items-center justify-center rounded-xl border border-emerald-600/80 bg-emerald-600/10 px-3 py-2 text-xs font-semibold text-emerald-800 shadow-sm hover:bg-emerald-600/20 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-emerald-100 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                              >
-                                  Actualizar
-                              </button>
-                          )}
-                          </div>
-                      </form>
-                  </div>
-                  {/* CONTENEDOR DEL LISTADO DE CATEGORIAS*/}
-                  <div className="p-5 md:p-6 rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm ring-1 ring-black/5">
-                      <h1 className="text-lg md:text-2xl font-semibold tracking-tight text-slate-900">Lista de Categorías</h1>
-                      {/* MAPEO DEL LISTADO DE CATEGORIAS CON EL FETCH USEFECT*/}
-                      <div className="space-y-2 max-h-[28rem] overflow-y-auto pr-1">
-                          {isLoading ? (
-                              // Skeleton loader list (fixed height to avoid layout shift)
-                              <div className="space-y-3">
-                                  {Array.from({ length: 6 }).map((_, i) => (
-                                      <div
-                                          key={i}
-                                          className="animate-pulse flex items-center justify-between rounded-xl border border-slate-200/90 bg-white/90 px-4 py-3"
-                                      >
-                                          <div className="h-5 w-48 rounded bg-slate-200" />
-                                          <div className="flex gap-2">
-                                              <div className="h-8 w-20 rounded bg-slate-200" />
-                                              <div className="h-8 w-20 rounded bg-slate-200" />
-                                          </div>
-                                      </div>
-                                  ))}
-                              </div>
-                          ) : categorias.length === 0 ? (
-                              <div className="rounded-xl border border-slate-200/90 bg-white/90 px-4 py-6 text-center text-slate-500">
-                                  No hay categorías registradas todavía.
-                              </div>
-                          ) : (
-                              categorias.map((categoria) => (
-                                  <div
-                                      className="flex items-center justify-between rounded-xl border border-slate-200/90 bg-white/90 px-3 py-2.5 shadow-sm hover:shadow-md transition"
-                                      key={categoria.id_categoriaProducto}
-                                  >
-                                      <h1 className="text-sm font-medium text-slate-800 truncate pr-2">{categoria.descripcionCategoria}</h1>
-                                      <div className="flex gap-2">
-                                          <button
-                                              className="inline-flex items-center rounded-lg border border-sky-600/80 bg-sky-50 px-3 py-1.5 text-[11px] font-semibold text-sky-700 hover:bg-sky-100 focus:outline-none focus:ring-4 focus:ring-sky-100 active:scale-[0.99] transition disabled:opacity-60 disabled:cursor-not-allowed"
-                                              onClick={() => seleccionarCategoriaEspecifica(categoria.id_categoriaProducto)}
-                                              disabled={isLoading}
-                                          >
-                                              Seleccionar
-                                          </button>
+                {/* Formulario de ingreso */}
+                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <h2 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">
+                            {categoriaSelecionado ? "Editar Categoria" : "Nueva Categoria"}
+                        </h2>
+                    </div>
 
-                                      </div>
-                                  </div>
-                              ))
-                          )}
-                      </div>
-                  </div>
-              </div>
+                    <div className="p-5 md:p-6">
+                        <form onSubmit={insertarCategoria}>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1.5">Nombre de la categoria</label>
+                                <input
+                                    type="text"
+                                    value={descripcionCategoria}
+                                    onChange={(event) => setdescripcionCategoria(event.target.value)}
+                                    placeholder="Ej: Tratamientos faciales, Insumos, Equipamiento..."
+                                    className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 shadow-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 placeholder:text-slate-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                                    disabled={isLoading}
+                                />
+                            </div>
 
+                            <div className="mt-4 flex flex-wrap items-center gap-2">
+                                {!categoriaSelecionado && (
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-sky-600 to-cyan-500 rounded-lg hover:from-sky-700 hover:to-cyan-600 transition-all duration-150 shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        Ingresar Categoria
+                                    </button>
+                                )}
 
-          </div>
+                                {categoriaSelecionado && (
+                                    <>
+                                        <button
+                                            onClick={() => actualizarCategoria(categoriaSelecionado.id_categoriaProducto, descripcionCategoria)}
+                                            type="button"
+                                            disabled={isLoading}
+                                            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-500 rounded-lg hover:from-emerald-700 hover:to-teal-600 transition-all duration-150 shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                            </svg>
+                                            Actualizar
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setCategoriaSelecionado(null);
+                                                setdescripcionCategoria("");
+                                            }}
+                                            type="button"
+                                            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-150"
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
-      </div>
+                {/* Lista de categorias */}
+                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/>
+                            </svg>
+                            <h2 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">Lista de Categorias</h2>
+                        </div>
+                        <span className="inline-flex items-center justify-center h-6 min-w-[24px] px-2 rounded-full text-xs font-bold bg-sky-100 text-sky-700">
+                            {categorias.length}
+                        </span>
+                    </div>
 
+                    <div className="p-5 md:p-6">
+                        {isLoading ? (
+                            <div className="space-y-3">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="animate-pulse flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3.5"
+                                    >
+                                        <div className="h-4 w-48 rounded bg-slate-200" />
+                                        <div className="flex gap-2">
+                                            <div className="h-8 w-20 rounded-lg bg-slate-200" />
+                                            <div className="h-8 w-20 rounded-lg bg-slate-200" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : categorias.length === 0 ? (
+                            <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50/50 px-4 py-10 text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-slate-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/>
+                                </svg>
+                                <p className="text-sm text-slate-500">No hay categorias registradas todavia.</p>
+                                <p className="text-xs text-slate-400 mt-1">Crea una nueva categoria usando el formulario superior.</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-2 max-h-[32rem] overflow-y-auto pr-1">
+                                {categorias.map((categoria) => (
+                                    <div
+                                        className={
+                                            "flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border px-4 py-3.5 transition-all duration-150 " +
+                                            (categoriaSelecionado?.id_categoriaProducto === categoria.id_categoriaProducto
+                                                ? "border-sky-300 bg-sky-50/50 shadow-sm ring-1 ring-sky-200"
+                                                : "border-slate-100 bg-white hover:border-slate-200 hover:shadow-sm")
+                                        }
+                                        key={categoria.id_categoriaProducto}
+                                    >
+                                        <h3 className="text-sm font-medium text-slate-800 truncate">{categoria.descripcionCategoria}</h3>
+                                        <div className="flex gap-2 flex-shrink-0">
+                                            <button
+                                                className="inline-flex items-center gap-1.5 rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 hover:bg-sky-100 focus:outline-none focus:ring-2 focus:ring-sky-200 active:scale-[0.98] transition disabled:opacity-60 disabled:cursor-not-allowed"
+                                                onClick={() => seleccionarCategoriaEspecifica(categoria.id_categoriaProducto)}
+                                                disabled={isLoading}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/>
+                                                </svg>
+                                                Editar
+                                            </button>
 
+                                            <button
+                                                className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-200 active:scale-[0.98] transition disabled:opacity-60 disabled:cursor-not-allowed"
+                                                onClick={() => eliminarCategorias(categoria.id_categoriaProducto)}
+                                                disabled={isLoading}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                                                </svg>
+                                                Eliminar
+                                            </button>
 
+                                            <button
+                                                className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-200 active:scale-[0.98] transition disabled:opacity-60 disabled:cursor-not-allowed"
+                                                onClick={() => navegarSubcategoria(categoria.id_categoriaProducto)}
+                                                disabled={isLoading}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/>
+                                                </svg>
+                                                Subcategoria
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
 
-
-
-
-      {/*PATALLAS DE ESCRITORIO*/}
-      <div className="hidden md:block min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/70 px-8 py-8">
-          <ToasterClient></ToasterClient>
-          <div className="mx-auto max-w-6xl rounded-2xl border border-slate-200/80 bg-white/80 shadow-lg ring-1 ring-black/5 backdrop-blur-sm p-5 md:p-8">
-              {/* CONTENEDOR DEL FORMULARIO DE INGRESO Y EDICION DE  CATEGORIAS*/}
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
-                  <div className="p-5 md:p-6 rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm ring-1 ring-black/5">
-                      <div className="mb-4">
-                        <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-slate-900">Gestión de Categorías</h1>
-                        <p className="text-xs text-slate-500">Crea nuevas categorías o selecciona una para editarla.</p>
-                      </div>
-                      <label className="text-[11px] font-semibold uppercase tracking-wide text-slate-600">Nombre de la categoría</label>
-                      <form onSubmit={insertarCategoria}>
-                          <input
-                              type={"text"}
-                              value={descripcionCategoria}
-                              onChange={(event) => setdescripcionCategoria(event.target.value)}
-                              placeholder="Tipo de categoría..."
-                              className="w-full mt-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-slate-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                              disabled={isLoading}
-                          />
-                          <div className="mt-3 flex flex-wrap items-center gap-2">
-                          <button
-                              type="submit"
-                              className="inline-flex items-center justify-center rounded-xl border border-blue-600/80 bg-blue-600/10 px-3 py-2 text-xs font-semibold text-blue-800 shadow-sm hover:bg-blue-600/20 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-blue-100 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                          >
-                              Ingresar Nueva Categoria
-                          </button>
-                          {categoriaSelecionado &&(
-                              <button
-                                  onClick={()=> actualizarCategoria(categoriaSelecionado.id_categoriaProducto, descripcionCategoria)}
-                                  type="button"
-                                  disabled={isLoading}
-                                  className="inline-flex items-center justify-center rounded-xl border border-emerald-600/80 bg-emerald-600/10 px-3 py-2 text-xs font-semibold text-emerald-800 shadow-sm hover:bg-emerald-600/20 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-emerald-100 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                              >
-                                  Actualizar
-                              </button>
-                          )}
-                          </div>
-                      </form>
-                  </div>
-                  {/* CONTENEDOR DEL LISTADO DE CATEGORIAS*/}
-                  <div className="p-5 md:p-6 rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm ring-1 ring-black/5">
-                      <h1 className="text-lg md:text-2xl font-semibold tracking-tight text-slate-900">Lista de Categorías</h1>
-                      {/* MAPEO DEL LISTADO DE CATEGORIAS CON EL FETCH USEFECT*/}
-                      <div className="space-y-2 max-h-[28rem] overflow-y-auto pr-1">
-                          {isLoading ? (
-                              // Skeleton loader list (fixed height to avoid layout shift)
-                              <div className="space-y-3">
-                                  {Array.from({ length: 6 }).map((_, i) => (
-                                      <div
-                                          key={i}
-                                          className="animate-pulse flex items-center justify-between rounded-xl border border-slate-200/90 bg-white/90 px-4 py-3"
-                                      >
-                                          <div className="h-5 w-48 rounded bg-slate-200" />
-                                          <div className="flex gap-2">
-                                              <div className="h-8 w-20 rounded bg-slate-200" />
-                                              <div className="h-8 w-20 rounded bg-slate-200" />
-                                          </div>
-                                      </div>
-                                  ))}
-                              </div>
-                          ) : categorias.length === 0 ? (
-                              <div className="rounded-xl border border-slate-200/90 bg-white/90 px-4 py-6 text-center text-slate-500">
-                                  No hay categorías registradas todavía.
-                              </div>
-                          ) : (
-                              categorias.map((categoria) => (
-                                  <div
-                                      className="flex items-center justify-between rounded-xl border border-slate-200/90 bg-white/90 px-3 py-2.5 shadow-sm hover:shadow-md transition"
-                                      key={categoria.id_categoriaProducto}
-                                  >
-                                      <h1 className="text-sm font-medium text-slate-800 truncate pr-2">{categoria.descripcionCategoria}</h1>
-                                      <div className="flex gap-2">
-                                          <button
-                                              className="inline-flex items-center rounded-lg border border-sky-600/80 bg-sky-50 px-3 py-1.5 text-[11px] font-semibold text-sky-700 hover:bg-sky-100 focus:outline-none focus:ring-4 focus:ring-sky-100 active:scale-[0.99] transition disabled:opacity-60 disabled:cursor-not-allowed"
-                                              onClick={() => seleccionarCategoriaEspecifica(categoria.id_categoriaProducto)}
-                                              disabled={isLoading}
-                                          >
-                                              Seleccionar
-                                          </button>
-                                          <button
-                                              className="inline-flex items-center rounded-lg border border-sky-600/80 bg-sky-50 px-3 py-1.5 text-[11px] font-semibold text-sky-700 hover:bg-sky-100 focus:outline-none focus:ring-4 focus:ring-sky-100 active:scale-[0.99] transition disabled:opacity-60 disabled:cursor-not-allowed"
-                                              onClick={() => navegarSubcategoria(categoria.id_categoriaProducto)}
-                                              disabled={isLoading}
-                                          >
-                                              Subcategoria
-                                          </button>
-
-                                      </div>
-                                  </div>
-                              ))
-                          )}
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+            </div>
+        </div>
+    </div>
 );
 }

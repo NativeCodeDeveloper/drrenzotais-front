@@ -171,7 +171,7 @@ export default function DashboardHome() {
                   AgendaClinica
                 </h1>
               </div>
-              <p className={cn("mt-2 text-base font-bold tracking-wide text-gray-400", michroma.className)}>Automatizacion Clinica  & Tecnologia</p>
+              <p className={cn("mt-2 text-base font-bold tracking-wide text-gray-400", michroma.className)}>Healthcare Information System</p>
             </div>
 
             {/* Status pill */}

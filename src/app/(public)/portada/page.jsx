@@ -54,10 +54,10 @@ export default function Portada() {
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Link
-              href="/contacto"
+              href="/AgendaProceso"
               className="rounded-full bg-slate-900 px-7 py-3 text-sm font-medium text-white transition hover:bg-slate-700"
             >
-              Solicitar evaluación
+              Agendar Evaluación
             </Link>
             <Link
               href="/servicios"

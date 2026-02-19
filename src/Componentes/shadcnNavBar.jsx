@@ -92,11 +92,11 @@ export function ShadcnNavBar() {
             </Link>
           ))}
           <Link
-            href="/contacto"
+            href="/AgendaProceso"
             className="mt-2 inline-flex rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white"
             onClick={() => setMobileOpen(false)}
           >
-            Agendar cita
+            Agendar Evaluación
           </Link>
         </div>
       </div>

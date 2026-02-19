@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 export function InputTextDinamic({ className, value, onChange, onClick, placeholder }) {
     const handleChange = (e) => {
         const val = e.target.value;
-        if (/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]*$/.test(val)) {
+        if (/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s]*$/.test(val)) {
             onChange?.(e);
         }
     };

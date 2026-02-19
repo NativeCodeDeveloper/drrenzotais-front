@@ -171,6 +171,17 @@ export default function DashboardLayout({ children }) {
                                         <span className="h-1 w-1 rounded-full bg-white/20 group-hover/link:bg-cyan-400 group-hover/link:shadow-[0_0_6px_rgba(34,211,238,0.5)] transition-all duration-150" />
                                         Categorías Productos/Servicios
                                     </Link>
+
+
+
+
+                                    <Link
+                                        href="/dashboard/presupuestoTratamiento"
+                                        className="group/link flex items-center gap-2.5 rounded-lg px-3 py-[7px] text-[13px] font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all duration-150"
+                                    >
+                                        <span className="h-1 w-1 rounded-full bg-white/20 group-hover/link:bg-cyan-400 group-hover/link:shadow-[0_0_6px_rgba(34,211,238,0.5)] transition-all duration-150" />
+                                        Generacion de Presupuesto
+                                    </Link>
                                 </div>
                             </details>
 
