@@ -146,7 +146,8 @@ export default function FormularioReserva() {
 
             if (data) {
 
-                const checkoutUrl = data.sandbox_init_point || data?.init_point;
+                //data.sandbox_init_point || PARA PRUEBAS LOCALES
+                const checkoutUrl = data?.init_point;
                 console.log("checkoutUrl:", checkoutUrl);
 
                 if (checkoutUrl) {
