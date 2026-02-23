@@ -366,7 +366,7 @@ export default function CalendarioMensualHoras() {
                     </h1>
 
                     <p className="max-w-md text-sm leading-6 text-slate-500">
-                        Reserva tu hora para depilacion en segundos. Selecciona fecha y un bloque horario disponible.
+                        Reserva tu hora de evaluación en segundos. Selecciona fecha y un bloque horario disponible.
                     </p>
                 </header>
 
@@ -569,7 +569,7 @@ export default function CalendarioMensualHoras() {
 
                 <footer className="mt-10 text-center text-xs text-slate-600">
                     <p>
-                        Depilación Trilaser Indolora, Tu piel suave y libre todo el año.
+                        Medicina estética regenerativa y no invasiva con atención personalizada.
                     </p>
                     <p className="mt-2 text-[11px] text-slate-400">
                         Horarios: Lun-Sáb 9:00-22:00 | Dom Cerrado

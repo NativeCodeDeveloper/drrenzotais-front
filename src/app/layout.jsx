@@ -21,19 +21,23 @@ export const metadataBase = new URL(
 
 export const metadata = {
   title: {
-    default: "Dr. Renzo Tais | Cirugía Plástica y Medicina Estética",
+    default: "Dr. Renzo Tais | Medicina Estética Regenerativa y No Invasiva",
     template: "%s | Dr. Renzo Tais",
   },
   description:
-    "Sitio oficial del Dr. Renzo Tais. Cirugía plástica y medicina estética con enfoque personalizado, tecnología avanzada y resultados naturales.",
+    "Sitio oficial del Dr. Renzo Tais. Medicina estética regenerativa y no invasiva con enfoque personalizado, tecnología avanzada y resultados naturales.",
   keywords: [
     "Dr. Renzo Tais",
-    "cirugía plástica",
+    "medicina estética regenerativa",
     "medicina estética",
-    "cirugía estética",
+    "tratamientos no invasivos",
     "rejuvenecimiento facial",
     "contorno corporal",
     "ultraformer",
+    "scizer",
+    "emsculpt neo",
+    "volnewmer",
+    "láser co2",
   ],
   authors: [{ name: "Dr. Renzo Tais", url: metadataBase.href }],
   publisher: "Dr. Renzo Tais",
@@ -48,9 +52,9 @@ export const metadata = {
     canonical: metadataBase.href,
   },
   openGraph: {
-    title: "Dr. Renzo Tais | Cirugía Plástica y Medicina Estética",
+    title: "Dr. Renzo Tais | Medicina Estética Regenerativa y No Invasiva",
     description:
-      "Atención médica personalizada en cirugía plástica y estética facial/corporal.",
+      "Atención médica personalizada en medicina estética regenerativa facial y corporal.",
     url: metadataBase.href,
     siteName: "Dr. Renzo Tais",
     locale: "es_CL",
@@ -58,7 +62,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dr. Renzo Tais | Cirugía Plástica",
+    title: "Dr. Renzo Tais | Medicina Estética Regenerativa",
     description:
       "Sitio oficial con información de procedimientos, evaluación y contacto.",
   },

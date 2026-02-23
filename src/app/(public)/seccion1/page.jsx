@@ -1,41 +1,45 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { parseDescripcionPublicacion } from "@/FuncionesTranversales/PublicacionesCarrusel";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
-const procedimientos = [
-  {
-    title: "Cirugía Plástica Mamaria",
-    text: "Aumento mamario, mastopexia, reducción mamaria y recambio de implantes con planificación personalizada.",
-    image: "/cirugiamamaria.png",
-  },
-  {
-    title: "Contorno Corporal",
-    text: "Lipoescultura, abdominoplastía y armonización de silueta para resultados proporcionales y naturales.",
-    image: "/foto4.avif",
-  },
-  {
-    title: "Cirugía Facial",
-    text: "Blefaroplastia, rinoplastia y rejuvenecimiento facial orientado a preservar expresión y equilibrio.",
-    image: "/foto1.avif",
-  },
-  {
-    title: "Cirugía Masculina",
-    text: "Protocolos específicos para pacientes masculinos con foco en definición, funcionalidad y estética.",
-    image: "/foto3.avif",
-  },
-  {
-    title: "Cirugía Íntima y Reconstructiva",
-    text: "Abordaje médico integral para indicaciones estéticas y reconstructivas según cada caso clínico.",
-    image: "/intimafem.jpg",
-  },
-  {
-    title: "Medicina Estética Integral",
-    text: "Tratamientos no invasivos para calidad de piel, firmeza y prevención del envejecimiento.",
-    image: "/foto2.avif",
-  },
-];
+const API = process.env.NEXT_PUBLIC_API_URL;
 
-export default function Seccion1() {
+export default function Page() {
+  const [datapublicaciones, setDatapublicaciones] = useState([]);
+
+  async function llamarPublicaciones() {
+    try {
+      const res = await fetch(`${API}/publicaciones/seleccionarPublicaciones`, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+        mode: "cors",
+      });
+
+      const data = await res.json();
+      if (data) {
+        setDatapublicaciones(data);
+      } else {
+        toast.error("No se encontraron publicaciones");
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Error al obtener las publicaciones, contacte soporte NATIVECODE");
+    }
+  }
+
+  useEffect(() => {
+    llamarPublicaciones();
+  }, []);
+
+  const cards = datapublicaciones.map((item) => ({
+    title: item.titulo,
+    text: parseDescripcionPublicacion(item.descripcion),
+    image: item.imagen_url,
+  }));
+
   return (
     <section id="doctor" className="scroll-mt-[96px] bg-white py-20 md:scroll-mt-[108px] md:py-24">
       <div className="mx-auto w-full max-w-7xl px-6 md:px-10 xl:px-12">
@@ -54,7 +58,7 @@ export default function Seccion1() {
               Dr. Renzo Tais
             </p>
             <h2 className="mt-5 text-3xl leading-tight text-slate-900 sm:text-4xl">
-              Profesional de la medicina estética integral con enfoque quirúrgico y no
+              Profesional de la medicina estética integral con enfoque regenerativo y no
               invasivo.
             </h2>
             <p className="mt-6 text-base text-justify leading-relaxed text-slate-600">
@@ -63,8 +67,8 @@ export default function Seccion1() {
               seguridad y resultados naturales en el tiempo.
             </p>
             <p className="mt-5 text-base text-justify leading-relaxed text-slate-600">
-              Esta base replica la estructura de servicios del sitio anterior para migrar
-              contenido sin perder información, pero con una presentación mucho más premium.
+              Cada plan se diseña según diagnóstico clínico, objetivos del paciente y
+              combinación estratégica de tecnologías regenerativas no invasivas.
             </p>
           </div>
         </div>
@@ -78,17 +82,17 @@ export default function Seccion1() {
           </h3>
 
           <div className="mt-12 grid gap-7 md:grid-cols-2 lg:grid-cols-3">
-            {procedimientos.map((item) => (
+            {cards.map((item) => (
               <article
                 key={item.title}
                 className="overflow-hidden rounded-3xl border border-slate-200 bg-[#f8fafc] shadow-sm"
               >
                 <div className="relative aspect-[16/10]">
-                  <Image src={item.image} alt={item.title} fill className="object-cover" />
-                </div>
-                <div className="p-7">
-                  <h4 className="text-xl leading-tight text-slate-900">{item.title}</h4>
-                  <p className="mt-4 text-sm leading-relaxed text-slate-600">{item.text}</p>
+                  <img
+                    src={`https://imagedelivery.net/aCBUhLfqUcxA2yhIBn1fNQ/${item.image}/full`}
+                    alt={item.title}
+                    className="w-full h-full object-cover object-center"
+                  />
                 </div>
               </article>
             ))}

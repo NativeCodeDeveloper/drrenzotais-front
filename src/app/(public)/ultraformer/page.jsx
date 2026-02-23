@@ -44,10 +44,10 @@ export default function UltraformerPage() {
 
         <div className="relative aspect-[6/5] overflow-hidden rounded-[2rem] border border-white/20 bg-slate-900 shadow-[0_24px_70px_-38px_rgba(15,23,42,0.85)]">
           <Image
-            src="/ultraformer.avif"
+            src="/mpt1.png"
             alt="Ultraformer MPT"
             fill
-            className="w-full h-full object-cover object-center "
+            className="w-full h-full object-center object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
         </div>

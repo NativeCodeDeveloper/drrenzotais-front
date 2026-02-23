@@ -3,18 +3,24 @@
 import React, { useState, useEffect } from "react";
 import {toast, Toaster} from "react-hot-toast";
 import {InfoButton} from "@/Componentes/InfoButton";
+import {
+    buildDescripcionPublicacion,
+    parseDescripcionPublicacion
+} from "@/FuncionesTranversales/PublicacionesCarrusel";
 
 export default function Publicaciones() {
     const [file, setfile] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
     // Estados para insertar nueva publicación (1 imagen)
-    const [newDescripcion, setNewDescripcion] = useState("");
+    const [newTitulo, setNewTitulo] = useState("");
+    const [newTexto, setNewTexto] = useState("");
     const [newFile, setNewFile] = useState(null);
     const [newPreview, setNewPreview] = useState(null);
     const [isInserting, setIsInserting] = useState(false);
 
 
-    const [descripcionPublicaciones, setDescripcionPublicaciones] = useState("");
+    const [editTitulo, setEditTitulo] = useState("");
+    const [editTexto, setEditTexto] = useState("");
     const [listaPublicaciones, setListaPublicaciones] = useState([]);
     const [id_publicaciones, setId_publicaciones] = useState("");
 
@@ -178,6 +184,28 @@ export default function Publicaciones() {
         listarPublicaciones();
     }, []);
 
+    useEffect(() => {
+        if (!id_publicaciones) {
+            setEditTitulo("");
+            setEditTexto("");
+            setfile([]);
+            return;
+        }
+
+        const publicacionSeleccionada = listaPublicaciones.find(
+            (item) => Number(item.id_publicaciones) === Number(id_publicaciones)
+        );
+        if (!publicacionSeleccionada) return;
+
+        const parsed = parseDescripcionPublicacion(publicacionSeleccionada.descripcionPublicaciones);
+        setEditTitulo(parsed.title || "");
+        setEditTexto(parsed.text || "");
+    }, [id_publicaciones, listaPublicaciones]);
+
+    function getPublicacionContent(publicacion) {
+        return parseDescripcionPublicacion(publicacion?.descripcionPublicaciones || "");
+    }
+
 
     async function insertarPublicacion(
         descripcionPublicaciones,
@@ -262,8 +290,8 @@ export default function Publicaciones() {
 
     async function handleInsertSubmit(e){
         e.preventDefault();
-        if (!newDescripcion || !newFile){
-            toast.error('Descripción e imagen son obligatorios para insertar');
+        if (!newTitulo || !newTexto || !newFile){
+            toast.error('Titulo, texto e imagen son obligatorios para insertar');
             return;
         }
         // Validar tipo MIME antes de subir
@@ -311,10 +339,12 @@ export default function Publicaciones() {
             }
 
             const imageId = data.imageId;
+            const descripcionSerializada = buildDescripcionPublicacion(newTitulo, newTexto);
             // Llamar a insertarPublicacion (usa la función existente)
-            await insertarPublicacion(newDescripcion, imageId, "", "");
+            await insertarPublicacion(descripcionSerializada, imageId, "", "");
             await listarPublicaciones();
-            setNewDescripcion("");
+            setNewTitulo("");
+            setNewTexto("");
             setNewFile(null);
             if (newPreview) {
                 URL.revokeObjectURL(newPreview);
@@ -329,26 +359,17 @@ export default function Publicaciones() {
         }
     }
 
-    // Ajuste: quitar selected del option para evitar warning de React controlado
-    useEffect(() => {
-        listarPublicaciones();
-    }, []);
-
-
-
-
     //LLAMADA A HASH DE CLOUDFLARE
     const CLOUDFLARE_HASH = process.env.NEXT_PUBLIC_CLOUDFLARE_HASH;
     const VARIANT_CARD = 'card';
     const VARIANT_FULL = 'full';
-    const VARIANT_MINI = 'mini';
-    const VARIANT_PORTADA = 'portada';
 
     // Utilidad para construir la URL de entrega de Cloudflare
     function cfToSrc(imageId, variant = VARIANT_CARD) {
         if (!imageId) return "";
         // Si ya es una URL completa (por compatibilidad), la retorna tal cual
         if (imageId.startsWith("http")) return imageId;
+        if (!CLOUDFLARE_HASH) return "";
         return `https://imagedelivery.net/${CLOUDFLARE_HASH}/${imageId}/${variant}`;
     }
 
@@ -365,16 +386,16 @@ export default function Publicaciones() {
     <div className="space-y-1">
         <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-gray-900">Publicaciones</h1>
         <p className="text-sm text-gray-500">
-            Administra las imágenes que se muestran en el carrusel bajo la portada.
+            Administra titulo, texto e imagenes del carrusel bajo la portada.
         </p>
     </div>
 
     <div className="flex justify-start sm:justify-end">
         <InfoButton informacion={'Nota informativa:\n' +
             'Este apartado está diseñado exclusivamente para la carga de imágenes que serán visualizadas en el carrusel ubicado debajo de la portada de la página principal.\n' +
-            'Las imágenes cargadas en esta sección no se mostrarán en ninguna otra área del sitio.\n' +
+            'La informacion de titulo y texto tambien se reflejara en ese carrusel.\n' +
             '\n' +
-            'La carga se realiza de una imagen por vez.\n' +
+            'La carga de imagen se realiza de una imagen por vez.\n' +
             'En caso de presentar inconvenientes durante el proceso, se recomienda intentar nuevamente utilizando una imagen de menor tamaño.\n' +
             'Para un mejor rendimiento y compatibilidad, se sugiere utilizar formatos PNG o JPG.\n'}/>
     </div>
@@ -397,7 +418,7 @@ export default function Publicaciones() {
                             <option value="" disabled>-- Selecciona una Publicacion --</option>
                             {listaPublicaciones.map((publicaciones) => (
                                 <option value={publicaciones.id_publicaciones} key={publicaciones.id_publicaciones}>
-                                    {publicaciones.descripcionPublicaciones}
+                                    {getPublicacionContent(publicaciones).title || `Publicacion #${publicaciones.id_publicaciones}`}
                                 </option>
                             ))}
                         </select>
@@ -407,22 +428,46 @@ export default function Publicaciones() {
                         onSubmit={async (e) => {
                             e.preventDefault();
                             setIsUploading(true);
-                            if (!file || file.length === 0) {
+                            if (!id_publicaciones) {
                                 setIsUploading(false);
-                                toast.error("Selecciona al menos una imagen");
+                                toast.error("Selecciona una publicacion para actualizar");
                                 return;
                             }
+
+                            if (!editTitulo || !editTexto) {
+                                setIsUploading(false);
+                                toast.error("Titulo y texto son obligatorios");
+                                return;
+                            }
+
+                            const publicacionSeleccionada = listaPublicaciones.find(
+                                (item) => Number(item.id_publicaciones) === Number(id_publicaciones)
+                            );
+
+                            if (!publicacionSeleccionada) {
+                                setIsUploading(false);
+                                toast.error("No se encontro la publicacion seleccionada");
+                                return;
+                            }
+
                             // Validar tipos MIME antes de subir
-                            for (const f of file) {
-                                if (!ALLOWED_IMAGE_TYPES.includes(f.type)) {
+                            for (const selectedFile of file) {
+                                if (!ALLOWED_IMAGE_TYPES.includes(selectedFile.type)) {
                                     setIsUploading(false);
                                     toast.error('Solo se permiten imágenes JPG, PNG, WEBP, GIF o SVG');
                                     return;
                                 }
                             }
-                            const uploadedIds = [];
-                            for (const f of file) {
-                                let toUpload = f;
+
+                            const nextImageIds = [
+                                publicacionSeleccionada.imagenPublicaciones_primera || "",
+                                publicacionSeleccionada.imagenPublicaciones_segunda || "",
+                                publicacionSeleccionada.imagenPublicaciones_tercera || ""
+                            ];
+
+                            for (let index = 0; index < file.length; index++) {
+                                const selectedFile = file[index];
+                                let toUpload = selectedFile;
                                 if (toUpload.size > MAX_UPLOAD_SIZE) {
                                     console.warn("Imagen supera 10MB, intentando comprimir...", {
                                         nombre: toUpload.name,
@@ -430,7 +475,7 @@ export default function Publicaciones() {
                                     });
                                     const compressed = await downscaleImage(toUpload, 1600, 1600, 0.82);
                                     if (compressed && compressed.size < toUpload.size) {
-                                        toUpload = new File([compressed], (f.name || "image") + ".jpg", { type: "image/jpeg" });
+                                        toUpload = new File([compressed], (selectedFile.name || "image") + ".jpg", { type: "image/jpeg" });
                                     }
                                 }
                                 // Validar tipo MIME tras compresión
@@ -463,18 +508,19 @@ export default function Publicaciones() {
                                     toast.error("Error al subir imagen a Cloudflare");
                                     return;
                                 }
-                                uploadedIds.push(data.imageId);
+                                nextImageIds[index] = data.imageId;
                             }
+
+                            const descripcionSerializada = buildDescripcionPublicacion(editTitulo, editTexto);
                             await actuzalizarPublicaciones(
-                                descripcionPublicaciones,
-                                uploadedIds[0] || "",
-                                uploadedIds[1] || "",
-                                uploadedIds[2] || "",
+                                descripcionSerializada,
+                                nextImageIds[0] || "",
+                                nextImageIds[1] || "",
+                                nextImageIds[2] || "",
                                 id_publicaciones
                             );
                             await listarPublicaciones();
                             setfile([]);
-                            setDescripcionPublicaciones("");
                             setIsUploading(false);
                         }}
                         className="space-y-4"
@@ -482,11 +528,16 @@ export default function Publicaciones() {
                         <div className="space-y-3">
                             <input
                                 type="text"
-                                name="descripcionPublicaciones"
-                                value={descripcionPublicaciones || ""}
-                                onChange={(e) => setDescripcionPublicaciones(e.target.value)}
+                                value={editTitulo || ""}
+                                onChange={(e) => setEditTitulo(e.target.value)}
                                 className="w-full h-11 rounded-2xl border border-gray-200 bg-white px-4 text-sm text-gray-900 shadow-sm transition placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                                placeholder="Nueva descripción"
+                                placeholder="Titulo"
+                            />
+                            <textarea
+                                value={editTexto || ""}
+                                onChange={(e) => setEditTexto(e.target.value)}
+                                className="w-full min-h-[120px] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm transition placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                                placeholder="Texto"
                             />
                             <input
                                 type="file"
@@ -530,9 +581,15 @@ export default function Publicaciones() {
                         <input
                             type="text"
                             className="w-full h-11 rounded-2xl border border-gray-200 bg-white px-4 text-sm text-gray-900 shadow-sm transition placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                            placeholder="Descripción"
-                            value={newDescripcion}
-                            onChange={(e) => setNewDescripcion(e.target.value)}
+                            placeholder="Titulo"
+                            value={newTitulo}
+                            onChange={(e) => setNewTitulo(e.target.value)}
+                        />
+                        <textarea
+                            className="w-full min-h-[120px] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm transition placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                            placeholder="Texto"
+                            value={newTexto}
+                            onChange={(e) => setNewTexto(e.target.value)}
                         />
                         <input
                             type="file"
@@ -567,7 +624,12 @@ export default function Publicaciones() {
                         {listaPublicaciones.map((publicaciones) => (
                             <article key={publicaciones.id_publicaciones} className="group rounded-2xl border bg-white shadow-sm hover:shadow-lg transition-shadow">
                                 <div className="p-4">
-                                    <h3 className="text-base font-medium truncate" title={publicaciones.descripcionPublicaciones}>{publicaciones.descripcionPublicaciones}</h3>
+                                    <h3 className="text-base font-medium truncate" title={getPublicacionContent(publicaciones).title || publicaciones.descripcionPublicaciones}>
+                                        {getPublicacionContent(publicaciones).title || `Publicacion #${publicaciones.id_publicaciones}`}
+                                    </h3>
+                                    <p className="mt-2 text-sm text-gray-500 line-clamp-2">
+                                        {getPublicacionContent(publicaciones).text || "Sin texto"}
+                                    </p>
                                 </div>
                                 <div className="p-4 pt-0">
                                     <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-gray-50 ring-1 ring-black/5">
@@ -618,4 +680,3 @@ export default function Publicaciones() {
 
 
 }
-
