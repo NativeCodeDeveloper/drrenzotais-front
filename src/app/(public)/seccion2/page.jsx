@@ -6,6 +6,7 @@ import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carouse
 import {
   parseDescripcionPublicacion,
 } from "@/FuncionesTranversales/PublicacionesCarrusel";
+import {toast} from "react-hot-toast";
 
 const fallbackCards = [
   {
@@ -41,81 +42,41 @@ const fallbackCards = [
 ];
 
 export default function Seccion2() {
-  const API = process.env.NEXT_PUBLIC_API_URL;
   const CLOUDFLARE_HASH = process.env.NEXT_PUBLIC_CLOUDFLARE_HASH;
   const [api, setApi] = useState();
   const [current, setCurrent] = useState(0);
   const [cards, setCards] = useState(fallbackCards);
 
-  function cfToSrc(imageId, variant = "full") {
-    if (!imageId) return "";
-    if (String(imageId).startsWith("http")) return imageId;
-    if (!CLOUDFLARE_HASH) return "";
-    return `https://imagedelivery.net/${CLOUDFLARE_HASH}/${imageId}/${variant}`;
-  }
+    //return `https://imagedelivery.net/${CLOUDFLARE_HASH}/${imageId}/card`;
 
-  useEffect(() => {
-    let active = true;
+
+    const API = process.env.NEXT_PUBLIC_API_URL;
+    const [dataPublicaciones, setDataPublicaciones] = useState([]);
 
     async function cargarCards() {
-      if (!API) return;
       try {
-        const res = await fetch(`${API}/publicaciones/seleccionarPublicaciones`, {
+        const res = await fetch(`${API}/carruselPortada/seleccionarCarruselPortada`, {
           method: "GET",
           headers: { Accept: "application/json" },
           cache: "no-store",
         });
-        if (!res.ok) return;
 
-        const publicaciones = await res.json();
-        const dynamicCards = [...publicaciones]
-          .sort((a, b) => Number(a.id_publicaciones) - Number(b.id_publicaciones))
-          .map((item, index) => {
-            const parsed = parseDescripcionPublicacion(item.descripcionPublicaciones);
-            const fallback = fallbackCards[index] || {};
-            return {
-              id: item.id_publicaciones ?? index,
-              title: parsed.title || fallback.title || `Procedimiento ${index + 1}`,
-              text: parsed.text || fallback.text || "",
-              image: cfToSrc(item.imagenPublicaciones_primera, "full") || fallback.image || "",
-            };
-          })
-          .filter((card) => Boolean(card.image || card.title || card.text));
-
-        if (active && dynamicCards.length > 0) {
-          setCards(dynamicCards);
-          setCurrent(0);
+        if (!res.ok)
+        {
+            return toast.error("No ha sido porisble cargar la informacion.")
+        }else{
+            const dataCarrusel = await res.json();
+            setDataPublicaciones(dataCarrusel);
         }
       } catch (error) {
-        console.error("Error cargando publicaciones para seccion2:", error);
+        return toast.error("Error cargando publicaciones para seccion2");
       }
     }
 
-    cargarCards();
-    return () => {
-      active = false;
-    };
-  }, [API, CLOUDFLARE_HASH]);
+    useEffect(() => {
+        cargarCards();
+    }, []);
 
-  useEffect(() => {
-    if (!api) return;
-
-    const onSelect = () => setCurrent(api.selectedScrollSnap());
-    onSelect();
-    api.on("select", onSelect);
-
-    const id = setInterval(() => {
-      const snaps = api.scrollSnapList();
-      if (!snaps.length) return;
-      const next = (api.selectedScrollSnap() + 1) % snaps.length;
-      api.scrollTo(next);
-    }, 3500);
-
-    return () => {
-      api.off("select", onSelect);
-      clearInterval(id);
-    };
-  }, [api]);
 
   return (
     <section
@@ -137,18 +98,18 @@ export default function Seccion2() {
         <div className="mt-12 overflow-hidden rounded-[2.1rem] border border-white/70 bg-white p-6 shadow-[0_22px_80px_-44px_rgba(15,23,42,0.5)] md:p-8">
           <Carousel setApi={setApi} opts={{ loop: true }} className="w-full">
             <CarouselContent className="-ml-5">
-              {cards.map((card, index) => (
+              {dataPublicaciones.map((card, index) => (
                 <CarouselItem
-                  key={card.id ?? `${card.title}-${index}`}
+                  key={card.id_publicacionesPortada ?? `${card.tituloPortadaCarrusel}-${index}`}
                   className="basis-full pl-5 md:basis-1/2 xl:basis-1/3"
                 >
                   <article className="h-full overflow-hidden rounded-3xl border border-slate-200 bg-[#f8fafc]">
                     <div className="relative aspect-[4/3]">
-                      <Image src={card.image} alt={card.title} fill className="object-cover" />
+                      <img src={`https://imagedelivery.net/${CLOUDFLARE_HASH}/${card.imagenPortada}/card`} alt="imagen" />
                     </div>
                     <div className="p-7">
-                      <h3 className="text-xl leading-tight text-slate-900">{card.title}</h3>
-                      <p className="mt-4 text-sm leading-relaxed text-slate-600">{card.text}</p>
+                      <h3 className="text-xl leading-tight text-slate-900">{card.tituloPortadaCarrusel}</h3>
+                      <p className="mt-4 text-sm leading-relaxed text-slate-600">{card.descripcionPublicacionesPortada}</p>
                     </div>
                   </article>
                 </CarouselItem>

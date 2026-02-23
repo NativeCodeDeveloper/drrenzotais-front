@@ -36,8 +36,8 @@ export default function Page() {
 
   const cards = datapublicaciones.map((item) => ({
     title: item.titulo,
-    text: parseDescripcionPublicacion(item.descripcion),
-    image: item.imagen_url,
+    text: parseDescripcionPublicacion(item.descripcionPublicaciones),
+    image: item.imagenPublicaciones_primera,
   }));
 
   return (
