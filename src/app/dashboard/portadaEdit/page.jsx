@@ -44,7 +44,9 @@ export default function CarruselPortada() {
           return toast.error("Debe completar toda la informacion para subir la portada");
         }
 
-        const imagenId = await subirImagenCloudflare(imagen);
+        const imagenId = await subirImagenCloudflare();
+        if(!imagenId) return;
+
         await insertarPortada(tituloPortadaCarrusel,descripcionPublicacionesPortada,imagenId);
         await seleccionarPortadas();
     }
@@ -83,6 +85,13 @@ export default function CarruselPortada() {
         });
 
         const data = await res.json();
+
+        if (!res.ok || !data.imageId) {
+            const detalle = data?.error || data?.details?.errors?.[0]?.message || JSON.stringify(data);
+            toast.error(`Error al subir imagen: ${detalle}`);
+            return null;
+        }
+
         return data.imageId;
     }
 

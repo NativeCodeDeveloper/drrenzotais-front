@@ -104,8 +104,12 @@ export default function Seccion2() {
                   className="basis-full pl-5 md:basis-1/2 xl:basis-1/3"
                 >
                   <article className="h-full overflow-hidden rounded-3xl border border-slate-200 bg-[#f8fafc]">
-                    <div className="relative aspect-[4/3]">
-                      <img src={`https://imagedelivery.net/${CLOUDFLARE_HASH}/${card.imagenPortada}/card`} alt="imagen" />
+                    <div className="relative aspect-[3/3] overflow-hidden">
+                      <img
+                        src={`https://imagedelivery.net/${CLOUDFLARE_HASH}/${card.imagenPortada}/card`}
+                        alt="imagen"
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
                     </div>
                     <div className="p-7">
                       <h3 className="text-xl leading-tight text-slate-900">{card.tituloPortadaCarrusel}</h3>
