@@ -79,8 +79,23 @@ export default function FormularioReserva() {
         setServicios();
     }, []);
 
-    // handleSubmit: se ejecuta al enviar el formulario
-    // Envía los datos al backend que crea la preferencia de Mercado Pago
+    /*
+                                   nombrePaciente,
+                    apellidoPaciente,
+                    rut,
+                    telefono,
+                    email,
+                    fechaInicio,
+                    horaInicio,
+                    fechaFinalizacion,
+                    horaFinalizacion,
+                    estadoReserva : 'pendiente pago',
+                    totalPago
+
+
+
+    * */
+
 
     async function pagarMercadoPago(
         nombrePaciente,
@@ -114,25 +129,20 @@ export default function FormularioReserva() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    productosDelCarrito: [
-                        {
-                            tituloProducto: `Reserva Consulta: ${servicioSeleccionado} con ${profesionalSeleccionado}`,
-                            precio: Number(totalPago),
-                            cantidad: 1,
-                        }
-                    ],
-                    comprador: {
-                        nombre_comprador: nombrePaciente,
-                        apellidosComprador: apellidoPaciente,
-                        telefono_comprador: telefono,
-                        email_Comprador: email,
-                        identificacion_comprador: rut,
-                        direccion_despacho: "",
-                        comuna: "",
-                        regionPais: "",
-                        comentarios: `Fecha: ${fechaInicio} | Hora: ${horaInicio} - ${horaFinalizacion}`,
-                        totalPagado: Number(totalPago),
-                    }
+                    tituloProducto: `Reserva Consulta: ${servicioSeleccionado} con ${profesionalSeleccionado}`,
+                    precio: Number(totalPago),
+                    cantidad: 1,
+                    nombrePaciente,
+                    apellidoPaciente,
+                    rut,
+                    telefono,
+                    email,
+                    fechaInicio,
+                    horaInicio,
+                    fechaFinalizacion,
+                    horaFinalizacion,
+                    estadoReserva : 'pendiente pago',
+                    totalPago
                 }),
                 mode: "cors",
             });
@@ -146,7 +156,7 @@ export default function FormularioReserva() {
 
             if (data) {
 
-                //data.sandbox_init_point || PARA PRUEBAS LOCALES
+                //data.sandbox_init_point || PARA PRUEBAS LOCALES ||data?.init_point;
                 const checkoutUrl = data?.init_point;
                 console.log("checkoutUrl:", checkoutUrl);
 
