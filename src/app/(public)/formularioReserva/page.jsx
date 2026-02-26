@@ -143,7 +143,7 @@ export default function FormularioReserva() {
                     horaInicio,
                     fechaFinalizacion,
                     horaFinalizacion,
-                    estadoReserva : 'pendiente pago',
+                    estadoReserva : 'reservada',
                     totalPago
                 }),
                 mode: "cors",
