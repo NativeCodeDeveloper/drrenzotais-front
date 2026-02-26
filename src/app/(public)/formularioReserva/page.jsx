@@ -92,6 +92,8 @@ export default function FormularioReserva() {
                     estadoReserva : 'pendiente pago',
                     totalPago
 
+                    ..
+
 
 
     * */
@@ -201,34 +203,34 @@ export default function FormularioReserva() {
                         e.preventDefault();
                     }}
                 >
-<div className="mt-4 flex flex-col  ">
+                    <div className="mt-4 flex flex-col  ">
 
-    <label className="block text-xs font-semibold text-slate-700 mb-2">Seleccione motivo de consulta</label>
+                        <label className="block text-xs font-semibold text-slate-700 mb-2">Seleccione motivo de consulta</label>
 
-    <SelectDinamic
-        value={totalPago}
-        onChange={(e) =>{
-            const indice = e.target.value;
-            const tarifaSeleccionada = listaTarifasProfesionales[indice];
-            if(tarifaSeleccionada){
-                setTotalPago(tarifaSeleccionada.precio);
-                setServicioSeleccionado(tarifaSeleccionada.nombreServicio);
-                setProfesionalSeleccionado(tarifaSeleccionada.nombreProfesional);
-            }else{
-                setTotalPago("");
-                setServicioSeleccionado("");
-            }
-        }}
+                        <SelectDinamic
+                            value={totalPago}
+                            onChange={(e) =>{
+                                const indice = e.target.value;
+                                const tarifaSeleccionada = listaTarifasProfesionales[indice];
+                                if(tarifaSeleccionada){
+                                    setTotalPago(tarifaSeleccionada.precio);
+                                    setServicioSeleccionado(tarifaSeleccionada.nombreServicio);
+                                    setProfesionalSeleccionado(tarifaSeleccionada.nombreProfesional);
+                                }else{
+                                    setTotalPago("");
+                                    setServicioSeleccionado("");
+                                }
+                            }}
 
 
-        placeholder="Seleccione un servicio"
-        options={listaTarifasProfesionales.map((tarifa,index) => ({
-            value: index,
-            label: `${tarifa.nombreServicio} - ${formatoCLP.format(tarifa.precio)}`
-        }))}
-        className={"-mt-2 " + (totalPago ? "border-green-400 bg-green-50 text-gray-900 font-semibold" : "")}
-    />
-</div>
+                            placeholder="Seleccione un servicio"
+                            options={listaTarifasProfesionales.map((tarifa,index) => ({
+                                value: index,
+                                label: `${tarifa.nombreServicio} - ${formatoCLP.format(tarifa.precio)}`
+                            }))}
+                            className={"-mt-2 " + (totalPago ? "border-green-400 bg-green-50 text-gray-900 font-semibold" : "")}
+                        />
+                    </div>
 
                     <br/>
 
@@ -382,3 +384,4 @@ export default function FormularioReserva() {
         </div>
     )
 }
+
