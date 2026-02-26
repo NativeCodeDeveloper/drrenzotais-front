@@ -48,29 +48,53 @@ export default function Calendario() {
                 overflow: visible !important;
                 word-break: break-word !important;
             }
-            
-            /* Estilos para eventos en vista semana y día */
+
+            /* Estilos para eventos en vista semana y dia */
             .rbc-time-view .rbc-event {
-                min-height: 30px !important;
-                height: auto !important;
-                padding: 6px 8px !important;
-                line-height: 1.3 !important;
+                padding: 4px 6px !important;
+                line-height: 1.2 !important;
                 white-space: normal !important;
                 overflow: visible !important;
                 word-break: break-word !important;
+                z-index: 2 !important;
             }
-            
+
+            /* Forzar que el contenedor del evento en time view no corte */
+            .rbc-time-view .rbc-event-content {
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+                white-space: normal !important;
+                word-break: break-word !important;
+                line-height: 1.2 !important;
+                font-size: 0.75rem !important;
+            }
+
+            /* Ocultar label de hora dentro del evento para ganar espacio */
+            .rbc-time-view .rbc-event-label {
+                display: none !important;
+            }
+
+            /* Que el slot del dia/semana permita overflow */
+            .rbc-day-slot .rbc-events-container {
+                margin-right: 0 !important;
+            }
+
+            .rbc-day-slot .rbc-event {
+                overflow: visible !important;
+            }
+
             /* Aumentar altura de las celdas del mes para que quepan los nombres */
             .rbc-month-view .rbc-day-slot {
                 min-height: 80px !important;
             }
-            
+
             /* Contenedor de eventos en mes */
             .rbc-row-segment {
                 z-index: 1 !important;
             }
-            
-            /* Texto del evento */
+
+            /* Texto del evento global */
             .rbc-event-label,
             .rbc-event-content {
                 white-space: normal !important;
@@ -296,20 +320,18 @@ export default function Calendario() {
     }, [dataAgenda]);
 
     // Permite que el contenido del evento haga wrap y no se corte en vistas con poco espacio
-    const eventStyleGetter = (..._args) => {
+    const eventStyleGetter = (_event, _start, _end, _isSelected) => {
         return {
             style: {
                 display: 'flex',
-                alignItems: 'center',
-                height: 'auto',
-                minHeight: '28px',
-                maxHeight: 'none',
+                alignItems: 'flex-start',
+                minHeight: '24px',
                 whiteSpace: 'normal',
                 overflow: 'visible',
                 textOverflow: 'clip',
-                lineHeight: '1.3',
-                padding: '6px 8px',
-                fontSize: '0.8rem',
+                lineHeight: '1.2',
+                padding: '4px 6px',
+                fontSize: '0.75rem',
                 boxSizing: 'border-box',
                 borderRadius: '4px',
                 backgroundColor: '#0284c7',
@@ -344,11 +366,13 @@ export default function Calendario() {
         return (
             <div
                 title={event.title}
-                className="break-words text-[13px] leading-snug font-medium w-full"
+                className="break-words text-[12px] leading-tight font-medium w-full"
                 style={{
                     whiteSpace: 'normal',
                     overflow: 'visible',
                     wordBreak: 'break-word',
+                    hyphens: 'auto',
+                    lineHeight: '1.2',
                 }}
             >
                 {event.title}
