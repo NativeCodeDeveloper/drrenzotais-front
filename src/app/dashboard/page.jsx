@@ -81,16 +81,16 @@ function MiniCalendar() {
     }, [year, month]);
 
     return (
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.03] backdrop-blur-md p-2.5">
-            <div className="mb-2 flex items-center justify-between">
-                <span className="text-[9px] font-semibold text-white/60 capitalize">{monthLabel}</span>
-                <Link href="/dashboard/calendarioGeneral" className="text-[8px] font-medium text-cyan-400/70 hover:text-cyan-300 transition-colors">
+        <div className="rounded-lg border border-white/[0.06] bg-white/[0.03] backdrop-blur-md p-4">
+            <div className="mb-3 flex items-center justify-between">
+                <span className="text-sm font-semibold text-white/60 capitalize">{monthLabel}</span>
+                <Link href="/dashboard/calendarioGeneral" className="text-xs font-medium text-cyan-400/70 hover:text-cyan-300 transition-colors">
                     Expandir
                 </Link>
             </div>
             <div className="grid grid-cols-7 gap-0 text-center">
                 {["Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"].map((d) => (
-                    <span key={d} className="pb-1 text-[7px] font-bold uppercase text-white/30">
+                    <span key={d} className="pb-1.5 text-[10px] font-bold uppercase text-white/30">
                         {d}
                     </span>
                 ))}
@@ -104,7 +104,7 @@ function MiniCalendar() {
                         <span
                             key={day}
                             className={cn(
-                                "flex h-5 w-full items-center justify-center rounded text-[8px] font-medium transition-all duration-200",
+                                "flex h-7 w-full items-center justify-center rounded text-xs font-medium transition-all duration-200",
                                 isToday
                                     ? "bg-gradient-to-br from-cyan-500/80 to-indigo-500/80 text-white shadow-sm shadow-cyan-500/20"
                                     : "text-white/50 hover:bg-white/[0.06] hover:text-white/70"
@@ -201,18 +201,18 @@ export default function DashboardHome() {
                                     AgendaClinica
                                 </h1>
                             </div>
-                            <p className={cn("mt-1.5 text-xs tracking-[0.2em]  text-gray-400/50", michroma.className)}>Healthcare Information System</p>
+                            <p className={cn("mt-1.5 text-sm tracking-[0.2em]  text-gray-400/50", michroma.className)}>Healthcare Information System</p>
                         </div>
 
                         {/* Status pill */}
-                        <div className="hidden sm:flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.03] backdrop-blur-md px-3 py-1.5">
-                            <div className="relative flex h-1.5 w-1.5">
+                        <div className="hidden sm:flex items-center gap-2.5 rounded-full border border-white/[0.06] bg-white/[0.03] backdrop-blur-md px-4 py-2">
+                            <div className="relative flex h-2 w-2">
                                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
-                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan-400" />
+                                <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400" />
                             </div>
-                            <span className="text-[9px] font-medium text-white/50">{getGreeting()}</span>
-                            <span className="h-2.5 w-px bg-white/10" />
-                            <span className="text-[9px] text-white/35 capitalize">{getFechaHoy()}</span>
+                            <span className="text-xs font-medium text-white/50">{getGreeting()}</span>
+                            <span className="h-3.5 w-px bg-white/10" />
+                            <span className="text-xs text-white/35 capitalize">{getFechaHoy()}</span>
                         </div>
                     </div>
                 </motion.div>
@@ -222,7 +222,7 @@ export default function DashboardHome() {
                     variants={stagger}
                     initial="hidden"
                     animate="visible"
-                    className="mb-4 grid grid-cols-2 gap-2 lg:grid-cols-4"
+                    className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4"
                 >
                     {kpis.map((kpi, i) => {
                         const Icon = kpi.icon;
@@ -231,35 +231,35 @@ export default function DashboardHome() {
                                 key={kpi.label}
                                 variants={fadeUp}
                                 custom={i + 1}
-                                className="group relative overflow-hidden rounded-lg border border-white/[0.06] bg-white/[0.03] backdrop-blur-md hover:bg-white/[0.05] transition-all duration-300 cursor-default p-2.5"
+                                className="group relative overflow-hidden rounded-lg border border-white/[0.06] bg-white/[0.03] backdrop-blur-md hover:bg-white/[0.05] transition-all duration-300 cursor-default p-4"
                             >
                                 <div className="pointer-events-none absolute -top-6 -right-6 h-14 w-14 rounded-full bg-indigo-500 opacity-[0.04] blur-2xl group-hover:opacity-[0.08] transition-opacity" />
 
                                 <div className="relative">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 ring-1 ring-indigo-500/10">
-                                            <Icon className="h-3.5 w-3.5 text-cyan-400/80" strokeWidth={1.8} />
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 ring-1 ring-indigo-500/10">
+                                            <Icon className="h-4.5 w-4.5 text-cyan-400/80" strokeWidth={1.8} />
                                         </div>
-                                        <span className="text-[8px] font-semibold tabular-nums text-indigo-400/60">{kpi.pct}%</span>
+                                        <span className="text-xs font-semibold tabular-nums text-indigo-400/60">{kpi.pct}%</span>
                                     </div>
 
-                                    <div className="text-xl font-extrabold tracking-tight text-white/90">
+                                    <div className="text-2xl font-extrabold tracking-tight text-white/90">
                                         {kpi.value}
                                     </div>
 
-                                    <span className="mt-0.5 block text-[8px] font-bold uppercase tracking-[0.15em] text-white/30">
+                                    <span className="mt-1 block text-xs font-bold uppercase tracking-[0.15em] text-white/30">
                                         {kpi.label}
                                     </span>
 
-                                    <div className="mt-2 h-[2px] w-full overflow-hidden rounded-full bg-white/[0.06]">
+                                    <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
                                         <div
                                             className="h-full rounded-full bg-gradient-to-r from-indigo-500/60 to-cyan-500/60 transition-all duration-700 ease-out"
                                             style={{ width: `${Math.max(kpi.pct, 3)}%` }}
                                         />
                                     </div>
-                                    <div className="mt-1 flex items-center justify-between">
-                                        <span className="text-[7px] text-white/25 font-medium">del total</span>
-                                        <span className="text-[7px] font-semibold tabular-nums text-white/40">{kpi.value}/{totalCitas}</span>
+                                    <div className="mt-1.5 flex items-center justify-between">
+                                        <span className="text-[10px] text-white/25 font-medium">del total</span>
+                                        <span className="text-[10px] font-semibold tabular-nums text-white/40">{kpi.value}/{totalCitas}</span>
                                     </div>
                                 </div>
                             </motion.div>
@@ -278,29 +278,29 @@ export default function DashboardHome() {
                         custom={5}
                         className="lg:col-span-2 rounded-lg border border-white/[0.06] bg-white/[0.03] backdrop-blur-md overflow-hidden"
                     >
-                        <div className="flex items-center justify-between border-b border-white/[0.06] px-3.5 py-2">
-                            <div className="flex items-center gap-1.5">
-                                <div className="flex h-5.5 w-5.5 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 ring-1 ring-indigo-500/10">
-                                    <Clock className="h-3 w-3 text-cyan-400/80" strokeWidth={2} />
+                        <div className="flex items-center justify-between border-b border-white/[0.06] px-4 py-3">
+                            <div className="flex items-center gap-2">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 ring-1 ring-indigo-500/10">
+                                    <Clock className="h-4 w-4 text-cyan-400/80" strokeWidth={2} />
                                 </div>
                                 <div>
-                                    <h2 className="text-[10px] font-semibold text-white/80">Proximas citas</h2>
-                                    <p className="text-[8px] text-white/30">Agenda de hoy</p>
+                                    <h2 className="text-sm font-semibold text-white/80">Proximas citas</h2>
+                                    <p className="text-xs text-white/30">Agenda de hoy</p>
                                 </div>
                             </div>
                             <Link
                                 href="/dashboard/agendaCitas"
-                                className="group/link flex items-center gap-1 rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-0.5 text-[8px] font-medium text-white/40 hover:text-cyan-400/80 hover:border-cyan-500/20 transition-all"
+                                className="group/link flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-3.5 py-1.5 text-xs font-medium text-white/40 hover:text-cyan-400/80 hover:border-cyan-500/20 transition-all"
                             >
                                 Ver todo
-                                <ArrowUpRight className="h-2 w-2 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
+                                <ArrowUpRight className="h-3 w-3 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
                             </Link>
                         </div>
 
                         <div className="divide-y divide-white/[0.04]">
                             {citasHoy.length === 0 ? (
-                                <div className="px-3.5 py-6 text-center">
-                                    <p className="text-[10px] text-white/30">No hay citas programadas para hoy</p>
+                                <div className="px-4 py-8 text-center">
+                                    <p className="text-sm text-white/30">No hay citas programadas para hoy</p>
                                 </div>
                             ) : (
                                 citasHoy.map((cita, idx) => (
@@ -310,16 +310,16 @@ export default function DashboardHome() {
                                         initial="hidden"
                                         animate="visible"
                                         custom={idx * 0.3 + 6}
-                                        className="group flex items-center gap-2.5 px-3.5 py-2 hover:bg-white/[0.03] transition-all duration-200"
+                                        className="group flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03] transition-all duration-200"
                                     >
-                                        <div className="flex flex-col items-center min-w-[32px]">
-                                            <span className="text-[10px] font-bold tabular-nums text-white/70">{cita.hora}</span>
-                                            <span className="text-[7px] text-white/25 font-medium uppercase">hrs</span>
+                                        <div className="flex flex-col items-center min-w-[40px]">
+                                            <span className="text-sm font-bold tabular-nums text-white/70">{cita.hora}</span>
+                                            <span className="text-[10px] text-white/25 font-medium uppercase">hrs</span>
                                         </div>
 
                                         <div className="flex flex-col items-center gap-0.5">
                                             <div className={cn(
-                                                "h-1 w-1 rounded-full",
+                                                "h-1.5 w-1.5 rounded-full",
                                                 cita.estado === "confirmada" && "bg-cyan-400/80",
                                                 cita.estado === "reservada" && "bg-indigo-400/80",
                                                 cita.estado === "anulada" && "bg-white/20",
@@ -328,17 +328,17 @@ export default function DashboardHome() {
                                             <div className="h-4 w-px bg-white/[0.06]" />
                                         </div>
 
-                                        <div className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded bg-indigo-500/10 text-[7px] font-bold text-indigo-300/60 ring-1 ring-indigo-500/10">
+                                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-indigo-500/10 text-[10px] font-bold text-indigo-300/60 ring-1 ring-indigo-500/10">
                                             {cita.iniciales}
                                         </div>
 
                                         <div className="min-w-0 flex-1">
-                                            <div className="text-[9px] font-semibold text-white/70 truncate">{cita.paciente}</div>
-                                            <div className="text-[8px] text-white/30">{cita.tipo}</div>
+                                            <div className="text-sm font-semibold text-white/70 truncate">{cita.paciente}</div>
+                                            <div className="text-xs text-white/30">{cita.tipo}</div>
                                         </div>
 
                                         <span className={cn(
-                                            "hidden sm:inline-flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[7px] font-medium capitalize",
+                                            "hidden sm:inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium capitalize",
                                             cita.estado === "confirmada" && "bg-cyan-500/10 text-cyan-400/70 ring-1 ring-cyan-500/10",
                                             cita.estado === "reservada" && "bg-indigo-500/10 text-indigo-400/70 ring-1 ring-indigo-500/10",
                                             cita.estado === "anulada" && "bg-white/[0.04] text-white/30 ring-1 ring-white/[0.06]",
@@ -347,26 +347,26 @@ export default function DashboardHome() {
                                             {cita.estado}
                                         </span>
 
-                                        <ChevronRight className="h-2.5 w-2.5 text-white/15 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <ChevronRight className="h-3.5 w-3.5 text-white/15 opacity-0 group-hover:opacity-100 transition-opacity" />
                                     </motion.div>
                                 ))
                             )}
                         </div>
 
                         {/* Footer */}
-                        <div className="flex items-center justify-between border-t border-white/[0.04] px-3.5 py-1.5 bg-white/[0.01]">
-                            <div className="flex items-center gap-1">
-                                <Activity className="h-2.5 w-2.5 text-white/25" />
-                                <span className="text-[7px] text-white/30">{citasHoy.length} citas hoy</span>
+                        <div className="flex items-center justify-between border-t border-white/[0.04] px-4 py-2.5 bg-white/[0.01]">
+                            <div className="flex items-center gap-1.5">
+                                <Activity className="h-3.5 w-3.5 text-white/25" />
+                                <span className="text-xs text-white/30">{citasHoy.length} citas hoy</span>
                             </div>
-                            <div className="flex items-center gap-2.5">
-                                <div className="flex items-center gap-0.5">
-                                    <span className="h-1 w-1 rounded-full bg-cyan-400/60" />
-                                    <span className="text-[7px] text-white/30">{citasConfirmadas} confirmadas</span>
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-cyan-400/60" />
+                                    <span className="text-xs text-white/30">{citasConfirmadas} confirmadas</span>
                                 </div>
-                                <div className="flex items-center gap-0.5">
-                                    <span className="h-1 w-1 rounded-full bg-indigo-400/60" />
-                                    <span className="text-[7px] text-white/30">{citasReservadas} reservadas</span>
+                                <div className="flex items-center gap-1">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-indigo-400/60" />
+                                    <span className="text-xs text-white/30">{citasReservadas} reservadas</span>
                                 </div>
                             </div>
                         </div>
@@ -381,30 +381,30 @@ export default function DashboardHome() {
                             initial="hidden"
                             animate="visible"
                             custom={6}
-                            className="rounded-lg border border-white/[0.06] bg-white/[0.03] backdrop-blur-md p-2.5"
+                            className="rounded-lg border border-white/[0.06] bg-white/[0.03] backdrop-blur-md p-4"
                         >
-                            <div className="flex items-center gap-1 mb-2">
-                                <Zap className="h-3 w-3 text-indigo-400/60" strokeWidth={2} />
-                                <h2 className="text-[9px] font-semibold text-white/60">Acciones rapidas</h2>
+                            <div className="flex items-center gap-1.5 mb-3">
+                                <Zap className="h-4 w-4 text-indigo-400/60" strokeWidth={2} />
+                                <h2 className="text-sm font-semibold text-white/60">Acciones rapidas</h2>
                             </div>
-                            <div className="grid grid-cols-2 gap-1.5">
+                            <div className="grid grid-cols-2 gap-2">
                                 {acciones.map((acc) => {
                                     const Icon = acc.icon;
                                     return (
                                         <Link
                                             key={acc.label}
                                             href={acc.href}
-                                            className="group relative flex flex-col items-center gap-1.5 rounded-md border border-white/[0.06] bg-white/[0.02] px-2 py-2.5 text-center transition-all duration-300 hover:bg-white/[0.05] hover:-translate-y-0.5"
+                                            className="group relative flex flex-col items-center gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] px-3 py-3.5 text-center transition-all duration-300 hover:bg-white/[0.05] hover:-translate-y-0.5"
                                         >
                                             <div className={cn(
-                                                "flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br transition-transform duration-300 group-hover:scale-110",
+                                                "flex h-9 w-9 items-center justify-center rounded-md bg-gradient-to-br transition-transform duration-300 group-hover:scale-110",
                                                 acc.color
                                             )}>
-                                                <Icon className="h-3 w-3 text-white/90" strokeWidth={1.8} />
+                                                <Icon className="h-4.5 w-4.5 text-white/90" strokeWidth={1.8} />
                                             </div>
                                             <div>
-                                                <span className="block text-[8px] font-semibold text-white/60">{acc.label}</span>
-                                                <span className="block text-[7px] text-white/25">{acc.desc}</span>
+                                                <span className="block text-xs font-semibold text-white/60">{acc.label}</span>
+                                                <span className="block text-[10px] text-white/25">{acc.desc}</span>
                                             </div>
                                         </Link>
                                     );

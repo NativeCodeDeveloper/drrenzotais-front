@@ -289,9 +289,14 @@ export default function SubSubCategoria(){
             return;
         }
 
-        // Si ya viene como URL (ej: desde BD / Cloudflare), úsala directamente
+        // Si ya viene como string (ID de Cloudflare o URL), construimos la URL completa
         if (typeof imagenReferencial === "string") {
-            setprevizualizacion(imagenReferencial);
+            const esUrl = imagenReferencial.startsWith("http");
+            setprevizualizacion(
+                esUrl
+                    ? imagenReferencial
+                    : `https://imagedelivery.net/aCBUhLfqUcxA2yhIBn1fNQ/${imagenReferencial}/card`
+            );
             return;
         }
 

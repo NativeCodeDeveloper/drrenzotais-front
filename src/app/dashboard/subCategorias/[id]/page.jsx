@@ -52,7 +52,6 @@ export default function SubCategoria(){
             })
             if (!res.ok) {
                 return toast.error('No fue posible seleccionar la categoria especifica contacte a soporte informatico de NativeCode');
-
             }
             const data = await res.json();
             setDescripcionCategoria(data.descripcionCategoria);
@@ -62,13 +61,14 @@ export default function SubCategoria(){
         }catch (e) {
             console.error(e);
         }
-
     }
     useEffect(() => {
         if (id) {
             seleccionarCategoriaEspecifica(id)
         }
     }, [id]);
+
+
 
 // FUNCION PARA LISTAR  SUBCATEGORIAS ESPECIFICA SELECCIONADA POR CADA CATEGORIA
     async function listarSubcategorias(id_categoriaProducto){
@@ -102,18 +102,20 @@ export default function SubCategoria(){
     }, [id]);
 
     // FUNCION PARA INSERTAR SUBCATEGORIAS  POR CADA CATEGORIA
-    async function insertarSubcategoria(id_categoriaProducto,descripcionCategoria){
+    async function insertarSubcategoria(descripcionCategoria, id_categoriaProducto){
         try {
             if (!id_categoriaProducto || !descripcionCategoria || descripcionSubcategoria ==="") {
                 return toast.error('Debe haber seleccionado almenos una categoria y escribir el nombre de la subcategoria')
             }
+
+            const imagenSubCategoria = 'CategoriaSinImagen'
 
             const res = await fetch(`${API}/subcategorias/insertarSubCategoria`, {
                 method: 'POST',
                 headers: {Accept: 'application/json',
                 'Content-Type': 'application/json'},
                 mode: 'cors',
-                body: JSON.stringify({id_categoriaProducto, descripcionCategoria}),
+                body: JSON.stringify({descripcionCategoria, imagenSubCategoria, id_categoriaProducto}),
             })
 
             if (!res.ok) {
@@ -124,7 +126,9 @@ export default function SubCategoria(){
 
                 if (resultadoBackend.message === "true") {
                     await listarSubcategorias(id)
-                    setDescripcionSubcategoria("");                    return toast.success('Subcategoria ingresada correctamente')
+                    setDescripcionSubcategoria("");
+                    return toast.success('Subcategoria ingresada correctamente')
+
                 }else if (resultadoBackend.message === "sindata") {
                     return toast.error('Debe seleccionar almenos una categoria y No debe quedar el campo vacio');
                 }else {
@@ -290,7 +294,7 @@ export default function SubCategoria(){
                                 <p className="text-sm text-slate-600">
                                     Subcategoría seleccionada:
                                     <span className="ml-2 inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-inset ring-blue-100">
-                                        {id_subcategoria}
+                                        {id}
                                     </span>
                                 </p>
                             </div>
@@ -315,7 +319,7 @@ export default function SubCategoria(){
                                 <div className="w-full sm:w-auto">
                                     <ShadcnButton
                                         nombre={'Ingresar Subcategoria'}
-                                        funcion={()=> insertarSubcategoria(id,descripcionSubcategoria)}
+                                        funcion={()=> insertarSubcategoria(descripcionSubcategoria,id)}
                                         className="w-full"
                                     />
                                 </div>

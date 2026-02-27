@@ -39,8 +39,8 @@ export default function Dashboard() {
     const [tituloSimilar, settituloSimilar] = useState("");
     const [listaSubcategorias, setlistaSubcategorias] = useState([]);
     const [listaSubSubCategorias, setlistaSubSubCategorias] = useState([]);
-    const [valor_previo, setvalor_previo] = useState("");
-    const [subcategorias, setsubcategorias] = useState("");
+    const [valor_previo, setvalor_previo] = useState("Sin SubCategoria");
+    const [subcategorias, setsubcategorias] = useState("Sin Sub-SubCategoria");
     const [subsubcategorias, setsubsubcategorias] = useState("");
 
 
@@ -992,7 +992,7 @@ useEffect(() => {
                       Panel de administración
                     </div>
                     <h1 className="mt-3 text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">
-                      Gestión de productos
+                      Gestión de Servicios Clinicos
                     </h1>
                     <p className="mt-2 max-w-2xl text-sm md:text-base text-slate-600 leading-relaxed">
                       En este módulo usted podrá crear y administrar los productos y/o servicios que se mostrarán en su catálogo.
