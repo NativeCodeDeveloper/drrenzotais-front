@@ -56,7 +56,7 @@ export default function CalendarioMensualHoras() {
         const slots = [];
         // Sábado: 10:00 - 17:00 | Lunes a Viernes: 13:00 - 21:00
         const startMinutes = dayOfWeek === 6 ? 10 * 60 : 13 * 60;
-        const endMinutes = dayOfWeek === 6 ? 16 * 60 : 21 * 60;
+        const endMinutes = dayOfWeek === 6 ? 16 * 60 : 20 * 60;
         let cursor = startMinutes;
 
         const minutesToHHMM = (min) => {
@@ -460,7 +460,7 @@ export default function CalendarioMensualHoras() {
                         <div className="mt-5">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-sm font-semibold text-slate-800">
-                                    Agenda ({fechaSeleccionada?.getDay() === 6 ? '10:00–16:00' : '13:00–21:00'})
+                                    Agenda ({fechaSeleccionada?.getDay() === 6 ? '10:00–16:00' : '13:00–20:00'})
                                 </h3>
                                 <div className="flex items-center gap-3">
                                     <p className="text-xs text-slate-500">Bloques de 60 min</p>
@@ -572,7 +572,7 @@ export default function CalendarioMensualHoras() {
                         Medicina estética regenerativa y no invasiva con atención personalizada.
                     </p>
                     <p className="mt-2 text-[11px] text-slate-400">
-                        Horarios: Lun-Vie 13:00-21:00 | Sáb 10:00-16:00 | Dom Cerrado
+                        Horarios: Lun-Vie 13:00-20:00 | Sáb 10:00-16:00 | Dom Cerrado
                     </p>
                 </footer>
             </div>
