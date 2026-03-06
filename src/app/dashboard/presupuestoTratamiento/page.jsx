@@ -85,106 +85,208 @@ export default function PresupuestoTratamiento() {
 
 
     async function descargarPresupuestoPDF() {
-        // 1. Crear el documento PDF (orientacion vertical, unidad mm, tamaño carta)
         const doc = new jsPDF("p", "mm", "letter");
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
+        const margin = 16;
 
-        // 2. Cargar fuente Michroma
-        const fontRes = await fetch("/fonts/Michroma-Regular.ttf");
-        const fontBuffer = await fontRes.arrayBuffer();
-        const fontBytes = new Uint8Array(fontBuffer);
-        let binary = "";
-        for (let i = 0; i < fontBytes.length; i++) {
-            binary += String.fromCharCode(fontBytes[i]);
+        // --- Colores del tema elegante fondo blanco ---
+        const dark = [24, 24, 27];       // zinc-900 (textos fuertes)
+        const darkAlt = [244, 244, 245]; // zinc-100 (cajas sutiles)
+        const gold = [212, 175, 55];     // dorado elegante
+        const lightText = [39, 39, 42];  // zinc-800 (texto cuerpo)
+        const mutedText = [113, 113, 122]; // zinc-500
+        const white = [255, 255, 255];
+
+        // --- Cargar logo ---
+        try {
+            const logoRes = await fetch("/dr1.png");
+            const logoBuffer = await logoRes.arrayBuffer();
+            const logoBytes = new Uint8Array(logoBuffer);
+            let logoBinary = "";
+            for (let i = 0; i < logoBytes.length; i++) {
+                logoBinary += String.fromCharCode(logoBytes[i]);
+            }
+            const logoBase64 = btoa(logoBinary);
+            doc.addImage(logoBase64, "PNG", margin, 10, 35, 35);
+        } catch (e) {
+            console.error("No se pudo cargar el logo:", e);
         }
-        const fontBase64 = btoa(binary);
-        doc.addFileToVFS("Michroma-Regular.ttf", fontBase64);
-        doc.addFont("Michroma-Regular.ttf", "Michroma", "normal");
 
-        // 3. Titulo de la plataforma con Michroma
-        doc.setFont("Michroma", "normal");
-        doc.setFontSize(22);
-        doc.setTextColor(2, 132, 199); // sky-600
-        doc.text("AgendaClinica", 14, 18);
+        // --- Header: info al lado del logo ---
+        doc.setFontSize(20);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...white);
+        doc.text("Dr. Renzo Tais", margin + 42, 22);
 
-        // 4. Subtitulo de la plataforma (tambien Michroma)
-        doc.setFontSize(9);
-        doc.setTextColor(148, 163, 184); // slate-400
-        doc.text("Healthcare Information System", 14, 24);
-
-        // Volver a fuente default para el resto del documento
+        doc.setFontSize(8);
         doc.setFont("helvetica", "normal");
+        doc.setTextColor(...mutedText);
+        doc.text("Medicina Estetica Regenerativa y No Invasiva", margin + 42, 28);
 
-        // 4. Linea separadora
-        doc.setDrawColor(226, 232, 240); // slate-200
-        doc.setLineWidth(0.5);
-        doc.line(14, 27, 200, 27);
+        doc.setFontSize(7.5);
+        doc.setTextColor(...mutedText);
+        doc.text("Luis Thayer Ojeda 0191, oficina 1205", margin + 42, 34);
+        doc.text("(diagonal al Costanera Center)", margin + 42, 38);
 
-        // 5. Titulo del documento
+        // --- Linea dorada separadora ---
+        doc.setDrawColor(...gold);
+        doc.setLineWidth(0.6);
+        doc.line(margin, 50, pageW - margin, 50);
+
+        // --- Titulo del documento ---
         doc.setFontSize(16);
-        doc.setTextColor(30, 41, 59); // slate-800
-        doc.text("Presupuesto de Tratamiento", 14, 35);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...gold);
+        doc.text("PRESUPUESTO DE ATENCION", margin, 60);
 
-        // 6. Fecha
-        doc.setFontSize(10);
-        doc.setTextColor(100, 116, 139); // slate-500
-        doc.text(`Fecha: ${new Date().toLocaleDateString("es-CL")}`, 14, 42);
+        // --- Fecha y numero ---
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(...mutedText);
+        doc.text(`Fecha de emision: ${new Date().toLocaleDateString("es-CL")}`, margin, 67);
+        doc.text(`N° ${String(Date.now()).slice(-6)}`, pageW - margin, 67, {align: "right"});
 
-        // 7. Datos del profesional y paciente
+        // --- Caja datos paciente / profesional ---
+        doc.setFillColor(...darkAlt);
+        doc.roundedRect(margin, 72, pageW - margin * 2, 28, 3, 3, "F");
+
         const profesionalLabel = listaProfesionales.find(p => String(p.id_profesional) === String(nombreProfesional));
-        doc.setFontSize(10);
-        doc.setTextColor(30, 41, 59);
-        doc.text(`Profesional: ${profesionalLabel?.nombreProfesional || "-"}`, 14, 50);
-        doc.text(`Paciente: ${nombrePaciente || "-"}`, 14, 56);
-        doc.text(`RUT / DNI: ${rutaPaciente || "-"}`, 14, 62);
+        const colLeft = margin + 6;
+        const colRight = pageW / 2 + 6;
 
-        // 8. Armar los datos de la tabla
-        const columns = ["Servicio", "Valor"];
-        const rows = listaPresupuesto.map(servicio => [
+        doc.setFontSize(7.5);
+        doc.setTextColor(...mutedText);
+        doc.text("PROFESIONAL", colLeft, 80);
+        doc.text("PACIENTE", colRight, 80);
+        doc.text("RUT / DNI", colLeft, 91);
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...lightText);
+        doc.text(profesionalLabel?.nombreProfesional || "-", colLeft, 85);
+        doc.text(nombrePaciente || "-", colRight, 85);
+        doc.setFont("helvetica", "normal");
+        doc.text(rutaPaciente || "-", colLeft, 96);
+
+        // --- Tabla de servicios ---
+        const columns = ["N°", "Servicio / Tratamiento", "Valor"];
+        const rows = listaPresupuesto.map((servicio, i) => [
+            String(i + 1),
             servicio.tituloProducto,
             formatoCLP.format(servicio.valorProducto)
         ]);
 
-        // 9. Generar la tabla en el PDF
         autoTable(doc, {
             head: [columns],
             body: rows,
-            startY: 68,
-            theme: "grid",
+            startY: 106,
+            theme: "plain",
             headStyles: {
-                fillColor: [2, 132, 199],
-                textColor: 255,
+                fillColor: gold,
+                textColor: dark,
                 fontStyle: "bold",
+                fontSize: 9,
+                cellPadding: {top: 4, bottom: 4, left: 6, right: 6},
+                halign: "left",
+            },
+            bodyStyles: {
+                textColor: lightText,
+                fontSize: 9,
+                cellPadding: {top: 3.5, bottom: 3.5, left: 6, right: 6},
+            },
+            alternateRowStyles: {
+                fillColor: darkAlt,
             },
             styles: {
-                fontSize: 10,
-                cellPadding: 4,
+                fillColor: white,
+                lineColor: [228, 228, 231], // zinc-200
+                lineWidth: 0.2,
             },
+            columnStyles: {
+                0: {cellWidth: 14, halign: "center"},
+                2: {cellWidth: 40, halign: "right", fontStyle: "bold"},
+            },
+            margin: {left: margin, right: margin},
         });
 
-        // 10. Agregar totales debajo de la tabla
-        let finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(12);
-        doc.setTextColor(100, 116, 139);
-        doc.text(`Subtotal: ${formatoCLP.format(totalPresupuesto)}`, 14, finalY);
+        // --- Totales ---
+        let finalY = doc.lastAutoTable.finalY + 6;
+
+        // Caja de totales alineada a la derecha
+        const totBoxW = 90;
+        const totBoxX = pageW - margin - totBoxW;
+
+        doc.setFillColor(...darkAlt);
+        doc.roundedRect(totBoxX, finalY, totBoxW, valorFinalDescuento ? 36 : 22, 3, 3, "F");
+
+        // Subtotal
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(...mutedText);
+        doc.text("Subtotal:", totBoxX + 6, finalY + 8);
+        doc.setTextColor(...lightText);
+        doc.text(formatoCLP.format(totalPresupuesto), totBoxX + totBoxW - 6, finalY + 8, {align: "right"});
 
         if (valorFinalDescuento) {
-            finalY += 8;
-            doc.setFontSize(14);
+            // Descuento
+            const descuento = totalPresupuesto - Number(valorFinalDescuento);
+            const pctDesc = totalPresupuesto > 0 ? Math.round((descuento / totalPresupuesto) * 100) : 0;
+            doc.setTextColor(...mutedText);
+            doc.text(`Descuento (${pctDesc}%):`, totBoxX + 6, finalY + 16);
+            doc.setTextColor(239, 68, 68); // red-500
+            doc.text(`-${formatoCLP.format(descuento)}`, totBoxX + totBoxW - 6, finalY + 16, {align: "right"});
+
+            // Linea separadora en caja
+            doc.setDrawColor(...gold);
+            doc.setLineWidth(0.4);
+            doc.line(totBoxX + 6, finalY + 21, totBoxX + totBoxW - 6, finalY + 21);
+
+            // Total final
+            doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
-            doc.setTextColor(2, 132, 199); // sky-600
-            doc.text(`Valor Final con Descuento: ${formatoCLP.format(Number(valorFinalDescuento))}`, 14, finalY);
-            doc.setFont("helvetica", "normal");
+            doc.setTextColor(...gold);
+            doc.text("TOTAL:", totBoxX + 6, finalY + 30);
+            doc.text(formatoCLP.format(Number(valorFinalDescuento)), totBoxX + totBoxW - 6, finalY + 30, {align: "right"});
+
+            finalY += 36;
         } else {
-            finalY += 8;
-            doc.setFontSize(14);
+            // Linea separadora
+            doc.setDrawColor(...gold);
+            doc.setLineWidth(0.4);
+            doc.line(totBoxX + 6, finalY + 12, totBoxX + totBoxW - 6, finalY + 12);
+
+            // Total
+            doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
-            doc.setTextColor(30, 41, 59);
-            doc.text(`Total: ${formatoCLP.format(totalPresupuesto)}`, 14, finalY);
-            doc.setFont("helvetica", "normal");
+            doc.setTextColor(...gold);
+            doc.text("TOTAL:", totBoxX + 6, finalY + 19);
+            doc.text(formatoCLP.format(totalPresupuesto), totBoxX + totBoxW - 6, finalY + 19, {align: "right"});
+
+            finalY += 22;
         }
 
-        // 7. Descargar el archivo
-        doc.save("presupuesto-tratamiento.pdf");
+        // --- Validez ---
+        finalY += 12;
+        doc.setFillColor(...darkAlt);
+        doc.roundedRect(margin, finalY, pageW - margin * 2, 14, 2, 2, "F");
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...gold);
+        doc.text("Presupuesto de atencion valido por 15 dias habiles", pageW / 2, finalY + 9, {align: "center"});
+
+        // --- Footer ---
+        doc.setDrawColor(...gold);
+        doc.setLineWidth(0.3);
+        doc.line(margin, pageH - 18, pageW - margin, pageH - 18);
+
+        doc.setFontSize(7);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(...mutedText);
+        doc.text("Dr. Renzo Tais | Medicina Estetica Regenerativa y No Invasiva", pageW / 2, pageH - 13, {align: "center"});
+        doc.text("Luis Thayer Ojeda 0191, oficina 1205 (diagonal al Costanera Center)", pageW / 2, pageH - 9, {align: "center"});
+
+        doc.save("presupuesto-dr-renzo-tais.pdf");
     }
 
 
