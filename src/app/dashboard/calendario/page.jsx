@@ -1,6 +1,6 @@
 "use client"
 
-import {useState, useMemo, useEffect} from "react";
+import {useState, useMemo, useEffect, Suspense} from "react";
 import {useSearchParams} from "next/navigation";
 import {Calendar, dateFnsLocalizer} from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -22,7 +22,15 @@ const locales = {es: es};
 const dfStartOfWeek = (date) => startOfWeek(date, {locale: es});
 const localizer = dateFnsLocalizer({format, parse, startOfWeek: dfStartOfWeek, getDay, locales});
 
-export default function Calendario() {
+export default function CalendarioPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-slate-400">Cargando calendario...</div>}>
+            <Calendario/>
+        </Suspense>
+    );
+}
+
+function Calendario() {
 
     const API = process.env.NEXT_PUBLIC_API_URL;
     const searchParams = useSearchParams();
@@ -325,6 +333,108 @@ export default function Calendario() {
         }
     }
 
+    // --- Bloqueo masivo por rango + días de la semana ---
+    const [mostrarBloqueoMasivo, setMostrarBloqueoMasivo] = useState(false);
+    const [bloqueoDesde, setBloqueoDesde] = useState("");
+    const [bloqueoHasta, setBloqueoHasta] = useState("");
+    const [bloqueoHoraInicio, setBloqueoHoraInicio] = useState("");
+    const [bloqueoHoraFin, setBloqueoHoraFin] = useState("");
+    const [bloqueoDias, setBloqueoDias] = useState(new Set());
+    const [bloqueando, setBloqueando] = useState(false);
+    const [bloqueoProgreso, setBloqueoProgreso] = useState({ok: 0, fail: 0, total: 0});
+
+    const diasSemana = [
+        {value: 1, label: "Lun"},
+        {value: 2, label: "Mar"},
+        {value: 3, label: "Mié"},
+        {value: 4, label: "Jue"},
+        {value: 5, label: "Vie"},
+        {value: 6, label: "Sáb"},
+    ];
+
+    function toggleDia(day) {
+        setBloqueoDias(prev => {
+            const copy = new Set(prev);
+            copy.has(day) ? copy.delete(day) : copy.add(day);
+            return copy;
+        });
+    }
+
+    async function ejecutarBloqueoMasivo() {
+        if (!bloqueoDesde || !bloqueoHasta || !bloqueoHoraInicio || !bloqueoHoraFin) {
+            return toast.error("Debe completar fecha desde, hasta, hora inicio y hora fin");
+        }
+        if (bloqueoDias.size === 0) {
+            return toast.error("Debe seleccionar al menos un día de la semana");
+        }
+
+        const desde = new Date(bloqueoDesde + "T00:00:00");
+        const hasta = new Date(bloqueoHasta + "T00:00:00");
+        if (hasta < desde) return toast.error("La fecha 'hasta' debe ser posterior a 'desde'");
+
+        // Generar todas las fechas que coincidan con los días seleccionados
+        const fechas = [];
+        const cursor = new Date(desde);
+        while (cursor <= hasta) {
+            const dow = cursor.getDay() === 0 ? 7 : cursor.getDay(); // 1=Lun ... 6=Sáb, 7=Dom
+            if (bloqueoDias.has(dow)) {
+                fechas.push(formatearFechaLocal(cursor));
+            }
+            cursor.setDate(cursor.getDate() + 1);
+        }
+
+        if (fechas.length === 0) {
+            return toast.error("No hay días que coincidan en el rango seleccionado");
+        }
+
+        setBloqueando(true);
+        setBloqueoProgreso({ok: 0, fail: 0, total: fechas.length});
+
+        let ok = 0;
+        let fail = 0;
+        const limit = 4;
+
+        for (let i = 0; i < fechas.length; i += limit) {
+            const batch = fechas.slice(i, i + limit);
+            const results = await Promise.allSettled(batch.map(async (fecha) => {
+                const res = await fetch(`${API}/reservaPacientes/insertarReserva`, {
+                    method: "POST",
+                    headers: {Accept: "application/json", "Content-Type": "application/json"},
+                    mode: "cors",
+                    body: JSON.stringify({
+                        nombrePaciente: "AGENDA BLOQUEADA",
+                        apellidoPaciente: "-",
+                        rut: "-",
+                        telefono: "-",
+                        email: "-",
+                        fechaInicio: fecha,
+                        horaInicio: bloqueoHoraInicio,
+                        fechaFinalizacion: fecha,
+                        horaFinalizacion: bloqueoHoraFin,
+                        estadoReserva: "reservada"
+                    })
+                });
+                const data = await res.json();
+                return data.message === true;
+            }));
+
+            results.forEach(r => {
+                if (r.status === "fulfilled" && r.value) ok++;
+                else fail++;
+            });
+            setBloqueoProgreso({ok, fail, total: fechas.length});
+        }
+
+        await cargarDataAgenda();
+        setBloqueando(false);
+
+        if (fail === 0) {
+            toast.success(`Se bloquearon ${ok} días correctamente`);
+        } else {
+            toast.success(`Bloqueados: ${ok} | No disponibles/con conflicto: ${fail}`);
+        }
+    }
+
     function limpiarData() {
         setNombrePaciente(""); setApellidoPaciente(""); setTelefono(""); setRut(""); setEmail("");
     }
@@ -488,6 +598,157 @@ export default function Calendario() {
                             </button>
                         </div>
                     </div>
+                </div>
+
+                {/* Bloqueo masivo (oculto temporalmente) */}
+                <div className="mb-8 hidden">
+                    <button
+                        onClick={() => setMostrarBloqueoMasivo(!mostrarBloqueoMasivo)}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-all duration-150 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        {mostrarBloqueoMasivo ? "Ocultar bloqueo masivo" : "Bloqueo masivo de horarios"}
+                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform duration-200 ${mostrarBloqueoMasivo ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    {mostrarBloqueoMasivo && (
+                        <div className="mt-4 bg-white border border-amber-200 rounded-xl shadow-sm overflow-hidden">
+                            <div className="border-b border-amber-100 bg-amber-50/50 px-5 py-3 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                </svg>
+                                <h2 className="text-sm font-semibold text-amber-800 tracking-wide uppercase">Bloqueo masivo por rango y días</h2>
+                            </div>
+                            <div className="p-5 md:p-6 space-y-5">
+                                <p className="text-xs text-slate-500">Seleccione un rango de fechas, los días de la semana y el horario a bloquear. El sistema creará un bloqueo por cada día que coincida.</p>
+
+                                {/* Rango de fechas */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">Desde</label>
+                                        <input
+                                            type="date"
+                                            value={bloqueoDesde}
+                                            onChange={(e) => setBloqueoDesde(e.target.value)}
+                                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">Hasta</label>
+                                        <input
+                                            type="date"
+                                            value={bloqueoHasta}
+                                            onChange={(e) => setBloqueoHasta(e.target.value)}
+                                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Hora inicio / fin en formato 24h */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">Hora inicio</label>
+                                        <select
+                                            value={bloqueoHoraInicio}
+                                            onChange={(e) => setBloqueoHoraInicio(e.target.value)}
+                                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200">
+                                            <option value="">Seleccionar hora</option>
+                                            {Array.from({length: 24}, (_, i) => {
+                                                const h = String(i).padStart(2, "0");
+                                                return <option key={h} value={`${h}:00:00`}>{h}:00 hrs</option>;
+                                            })}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">Hora fin</label>
+                                        <select
+                                            value={bloqueoHoraFin}
+                                            onChange={(e) => setBloqueoHoraFin(e.target.value)}
+                                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200">
+                                            <option value="">Seleccionar hora</option>
+                                            {Array.from({length: 24}, (_, i) => {
+                                                const h = String(i).padStart(2, "0");
+                                                return <option key={h} value={`${h}:00:00`}>{h}:00 hrs</option>;
+                                            })}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* Días de la semana */}
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Días de la semana</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {diasSemana.map((dia) => (
+                                            <button
+                                                key={dia.value}
+                                                type="button"
+                                                onClick={() => toggleDia(dia.value)}
+                                                className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all duration-150 ${
+                                                    bloqueoDias.has(dia.value)
+                                                        ? "bg-amber-500 text-white border-amber-500 shadow-md"
+                                                        : "bg-white text-slate-600 border-slate-200 hover:border-amber-300 hover:bg-amber-50"
+                                                }`}>
+                                                {dia.label}
+                                            </button>
+                                        ))}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (bloqueoDias.size === diasSemana.length) {
+                                                    setBloqueoDias(new Set());
+                                                } else {
+                                                    setBloqueoDias(new Set(diasSemana.map(d => d.value)));
+                                                }
+                                            }}
+                                            className="px-4 py-2 rounded-lg text-sm font-medium border border-dashed border-slate-300 text-slate-500 hover:border-amber-400 hover:text-amber-600 transition-all duration-150">
+                                            {bloqueoDias.size === diasSemana.length ? "Ninguno" : "Todos"}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Resumen y botón ejecutar */}
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
+                                    {bloqueando ? (
+                                        <div className="flex items-center gap-3">
+                                            <svg className="w-4 h-4 animate-spin text-amber-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                            </svg>
+                                            <span className="text-sm text-slate-600">
+                                                Bloqueando... {bloqueoProgreso.ok + bloqueoProgreso.fail} / {bloqueoProgreso.total}
+                                            </span>
+                                            <span className="text-xs text-emerald-600 font-medium">{bloqueoProgreso.ok} OK</span>
+                                            {bloqueoProgreso.fail > 0 && (
+                                                <span className="text-xs text-red-500 font-medium">{bloqueoProgreso.fail} con conflicto</span>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <p className="text-xs text-slate-400">
+                                            {bloqueoDias.size > 0 && bloqueoDesde && bloqueoHasta
+                                                ? `Se bloquearán los días ${[...bloqueoDias].sort().map(d => diasSemana.find(ds => ds.value === d)?.label).join(", ")} del ${bloqueoDesde} al ${bloqueoHasta}`
+                                                : "Complete los campos para ver el resumen"}
+                                        </p>
+                                    )}
+                                    <button
+                                        onClick={() => ejecutarBloqueoMasivo()}
+                                        disabled={bloqueando}
+                                        className={`inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg transition-all duration-150 shadow-sm ${
+                                            bloqueando
+                                                ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
+                                                : "bg-amber-500 text-white border border-amber-500 hover:bg-amber-600 hover:shadow-md"
+                                        }`}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                        </svg>
+                                        Ejecutar bloqueo masivo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Calendario */}
