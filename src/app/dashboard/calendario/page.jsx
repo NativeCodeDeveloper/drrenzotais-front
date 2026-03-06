@@ -333,58 +333,34 @@ function Calendario() {
         }
     }
 
-    // --- Bloqueo masivo por rango + días de la semana ---
+    // --- Bloqueo masivo por rango ---
     const [mostrarBloqueoMasivo, setMostrarBloqueoMasivo] = useState(false);
     const [bloqueoDesde, setBloqueoDesde] = useState("");
     const [bloqueoHasta, setBloqueoHasta] = useState("");
     const [bloqueoHoraInicio, setBloqueoHoraInicio] = useState("");
     const [bloqueoHoraFin, setBloqueoHoraFin] = useState("");
-    const [bloqueoDias, setBloqueoDias] = useState(new Set());
     const [bloqueando, setBloqueando] = useState(false);
     const [bloqueoProgreso, setBloqueoProgreso] = useState({ok: 0, fail: 0, total: 0});
-
-    const diasSemana = [
-        {value: 1, label: "Lun"},
-        {value: 2, label: "Mar"},
-        {value: 3, label: "Mié"},
-        {value: 4, label: "Jue"},
-        {value: 5, label: "Vie"},
-        {value: 6, label: "Sáb"},
-    ];
-
-    function toggleDia(day) {
-        setBloqueoDias(prev => {
-            const copy = new Set(prev);
-            copy.has(day) ? copy.delete(day) : copy.add(day);
-            return copy;
-        });
-    }
 
     async function ejecutarBloqueoMasivo() {
         if (!bloqueoDesde || !bloqueoHasta || !bloqueoHoraInicio || !bloqueoHoraFin) {
             return toast.error("Debe completar fecha desde, hasta, hora inicio y hora fin");
-        }
-        if (bloqueoDias.size === 0) {
-            return toast.error("Debe seleccionar al menos un día de la semana");
         }
 
         const desde = new Date(bloqueoDesde + "T00:00:00");
         const hasta = new Date(bloqueoHasta + "T00:00:00");
         if (hasta < desde) return toast.error("La fecha 'hasta' debe ser posterior a 'desde'");
 
-        // Generar todas las fechas que coincidan con los días seleccionados
+        // Generar todas las fechas del rango
         const fechas = [];
         const cursor = new Date(desde);
         while (cursor <= hasta) {
-            const dow = cursor.getDay() === 0 ? 7 : cursor.getDay(); // 1=Lun ... 6=Sáb, 7=Dom
-            if (bloqueoDias.has(dow)) {
-                fechas.push(formatearFechaLocal(cursor));
-            }
+            fechas.push(formatearFechaLocal(cursor));
             cursor.setDate(cursor.getDate() + 1);
         }
 
         if (fechas.length === 0) {
-            return toast.error("No hay días que coincidan en el rango seleccionado");
+            return toast.error("No hay días en el rango seleccionado");
         }
 
         setBloqueando(true);
@@ -397,7 +373,7 @@ function Calendario() {
         for (let i = 0; i < fechas.length; i += limit) {
             const batch = fechas.slice(i, i + limit);
             const results = await Promise.allSettled(batch.map(async (fecha) => {
-                const res = await fetch(`${API}/reservaPacientes/insertarReserva`, {
+                const res = await fetch(`${API}/reservaPacientes/insertarReservaBloqueos`, {
                     method: "POST",
                     headers: {Accept: "application/json", "Content-Type": "application/json"},
                     mode: "cors",
@@ -579,15 +555,6 @@ function Calendario() {
                             </button>
 
                             <button
-                                onClick={() => bloquearAgenda(fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion)}
-                                className="inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors duration-150">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
-                                </svg>
-                                Bloquear
-                            </button>
-
-                            <button
                                 onClick={() => eliminarReserva()}
                                 disabled={!id_reserva}
                                 className={`inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-lg transition-all duration-150 ${id_reserva ? "text-white bg-red-600 border border-red-600 hover:bg-red-700 shadow-sm hover:shadow-md" : "text-slate-400 bg-slate-100 border border-slate-200 cursor-not-allowed"}`}>
@@ -600,8 +567,8 @@ function Calendario() {
                     </div>
                 </div>
 
-                {/* Bloqueo masivo (oculto temporalmente) */}
-                <div className="mb-8 hidden">
+                {/* Bloqueo masivo */}
+                <div className="mb-8">
                     <button
                         onClick={() => setMostrarBloqueoMasivo(!mostrarBloqueoMasivo)}
                         className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-all duration-150 shadow-sm">
@@ -620,10 +587,10 @@ function Calendario() {
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
                                 </svg>
-                                <h2 className="text-sm font-semibold text-amber-800 tracking-wide uppercase">Bloqueo masivo por rango y días</h2>
+                                <h2 className="text-sm font-semibold text-amber-800 tracking-wide uppercase">Bloqueo masivo por rango de fechas</h2>
                             </div>
                             <div className="p-5 md:p-6 space-y-5">
-                                <p className="text-xs text-slate-500">Seleccione un rango de fechas, los días de la semana y el horario a bloquear. El sistema creará un bloqueo por cada día que coincida.</p>
+                                <p className="text-xs text-slate-500">Seleccione un rango de fechas y el horario a bloquear. El sistema creará un bloqueo por cada día del rango.</p>
 
                                 {/* Rango de fechas */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -677,38 +644,6 @@ function Calendario() {
                                     </div>
                                 </div>
 
-                                {/* Días de la semana */}
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Días de la semana</label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {diasSemana.map((dia) => (
-                                            <button
-                                                key={dia.value}
-                                                type="button"
-                                                onClick={() => toggleDia(dia.value)}
-                                                className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all duration-150 ${
-                                                    bloqueoDias.has(dia.value)
-                                                        ? "bg-amber-500 text-white border-amber-500 shadow-md"
-                                                        : "bg-white text-slate-600 border-slate-200 hover:border-amber-300 hover:bg-amber-50"
-                                                }`}>
-                                                {dia.label}
-                                            </button>
-                                        ))}
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                if (bloqueoDias.size === diasSemana.length) {
-                                                    setBloqueoDias(new Set());
-                                                } else {
-                                                    setBloqueoDias(new Set(diasSemana.map(d => d.value)));
-                                                }
-                                            }}
-                                            className="px-4 py-2 rounded-lg text-sm font-medium border border-dashed border-slate-300 text-slate-500 hover:border-amber-400 hover:text-amber-600 transition-all duration-150">
-                                            {bloqueoDias.size === diasSemana.length ? "Ninguno" : "Todos"}
-                                        </button>
-                                    </div>
-                                </div>
-
                                 {/* Resumen y botón ejecutar */}
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
                                     {bloqueando ? (
@@ -727,8 +662,8 @@ function Calendario() {
                                         </div>
                                     ) : (
                                         <p className="text-xs text-slate-400">
-                                            {bloqueoDias.size > 0 && bloqueoDesde && bloqueoHasta
-                                                ? `Se bloquearán los días ${[...bloqueoDias].sort().map(d => diasSemana.find(ds => ds.value === d)?.label).join(", ")} del ${bloqueoDesde} al ${bloqueoHasta}`
+                                            {bloqueoDesde && bloqueoHasta
+                                                ? `Se bloquearán todos los días del ${bloqueoDesde} al ${bloqueoHasta}`
                                                 : "Complete los campos para ver el resumen"}
                                         </p>
                                     )}
