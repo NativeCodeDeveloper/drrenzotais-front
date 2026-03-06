@@ -256,6 +256,26 @@ export default function Paciente() {
                     </div>
                     <div className="flex items-center gap-2">
                         <InfoButton informacion={'En este apartado se mostrarán las fichas clínicas del paciente, ordenadas desde la más reciente a la más antigua, incluyendo tanto las fichas como sus anotaciones asociadas.\n\nPara editar una ficha clínica, debe seleccionarse el botón Editar, lo que lo llevará al formulario correspondiente donde podrá modificar la información de la ficha seleccionada.\n\nEn caso de eliminar una ficha clínica, deberá presionar el botón Eliminar. Esta acción removerá la ficha seleccionada del sistema.\n\nSi desea crear una nueva ficha clínica, debe seleccionar el botón Nueva Ficha, el cual lo dirigirá al formulario de ingreso para registrar una nueva ficha clínica.'}/>
+                        {detallePaciente.length > 0 && (() => {
+                            const p = detallePaciente[0];
+                            const params = new URLSearchParams({
+                                nombre: p.nombre || "",
+                                apellido: p.apellido || "",
+                                rut: p.rut || "",
+                                telefono: p.telefono || "",
+                                email: p.correo || "",
+                            });
+                            return (
+                                <button
+                                    onClick={() => router.push(`/dashboard/calendario?${params.toString()}`)}
+                                    className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-all duration-150 shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    Agendar Paciente
+                                </button>
+                            );
+                        })()}
                         <button
                             onClick={() => volverAFichas()}
                             className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all duration-150 shadow-sm">

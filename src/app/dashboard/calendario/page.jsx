@@ -1,6 +1,7 @@
 "use client"
 
 import {useState, useMemo, useEffect} from "react";
+import {useSearchParams} from "next/navigation";
 import {Calendar, dateFnsLocalizer} from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import format from "date-fns/format";
@@ -24,6 +25,21 @@ const localizer = dateFnsLocalizer({format, parse, startOfWeek: dfStartOfWeek, g
 export default function Calendario() {
 
     const API = process.env.NEXT_PUBLIC_API_URL;
+    const searchParams = useSearchParams();
+
+    // Pre-llenar datos del paciente si vienen por query params (ej. desde Ficha Paciente)
+    useEffect(() => {
+        const nombre = searchParams.get("nombre");
+        const apellido = searchParams.get("apellido");
+        const rutParam = searchParams.get("rut");
+        const telefonoParam = searchParams.get("telefono");
+        const emailParam = searchParams.get("email");
+        if (nombre) setNombrePaciente(nombre);
+        if (apellido) setApellidoPaciente(apellido);
+        if (rutParam) setRut(rutParam);
+        if (telefonoParam) setTelefono(telefonoParam);
+        if (emailParam) setEmail(emailParam);
+    }, [searchParams]);
 
     useEffect(() => {
         const style = document.createElement('style');
@@ -284,6 +300,31 @@ export default function Calendario() {
         if (id_reserva) seleccionarReservaEspecifica(id_reserva);
     }, [id_reserva]);
 
+    async function eliminarReserva() {
+        try {
+            if (!id_reserva) return toast.error("Debe seleccionar una reserva para eliminarla");
+            const res = await fetch(`${API}/reservaPacientes/eliminarReserva`, {
+                method: "POST",
+                headers: {Accept: "application/json", "Content-Type": "application/json"},
+                mode: "cors",
+                body: JSON.stringify({id_reserva})
+            });
+            if (!res.ok) return toast.error("El servidor no responde");
+            const respuestaBackend = await res.json();
+            if (respuestaBackend.message === true) {
+                setNombrePaciente(""); setApellidoPaciente(""); setTelefono(""); setRut(""); setEmail("");
+                setid_reserva(0);
+                await cargarDataAgenda();
+                return toast.success("Se ha eliminado la reserva correctamente");
+            } else {
+                return toast.error("No se pudo eliminar la reserva");
+            }
+        } catch (error) {
+            console.log(error);
+            return toast.error("Error al eliminar la reserva");
+        }
+    }
+
     function limpiarData() {
         setNombrePaciente(""); setApellidoPaciente(""); setTelefono(""); setRut(""); setEmail("");
     }
@@ -434,6 +475,16 @@ export default function Calendario() {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
                                 </svg>
                                 Bloquear
+                            </button>
+
+                            <button
+                                onClick={() => eliminarReserva()}
+                                disabled={!id_reserva}
+                                className={`inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-lg transition-all duration-150 ${id_reserva ? "text-white bg-red-600 border border-red-600 hover:bg-red-700 shadow-sm hover:shadow-md" : "text-slate-400 bg-slate-100 border border-slate-200 cursor-not-allowed"}`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                                Eliminar Reserva
                             </button>
                         </div>
                     </div>
