@@ -41,7 +41,8 @@ export default function CalendarioMensualHoras() {
     };
 
     // Genera los bloques de atención (60 min) según el día de la semana
-    // Lunes a Sábado: 09:00 - 22:00
+    // Lunes a Viernes: 13:00 - 21:00
+    // Sábado: 10:00 - 17:00
     // Domingo: No disponible
     // Los inicios van separados por 70 minutos (60 atención + 10 descanso), pero los descansos no se muestran.
     const attentionSlots = useMemo(() => {
@@ -53,9 +54,9 @@ export default function CalendarioMensualHoras() {
         if (dayOfWeek === 0) return [];
 
         const slots = [];
-        const startMinutes = 9 * 60; // 09:00
-        // Lunes a Sábado hasta 22:00
-        const endMinutes = 22 * 60;
+        // Sábado: 10:00 - 17:00 | Lunes a Viernes: 13:00 - 21:00
+        const startMinutes = dayOfWeek === 6 ? 10 * 60 : 13 * 60;
+        const endMinutes = dayOfWeek === 6 ? 16 * 60 : 21 * 60;
         let cursor = startMinutes;
 
         const minutesToHHMM = (min) => {
@@ -68,8 +69,7 @@ export default function CalendarioMensualHoras() {
             const attStart = cursor;
             const attEnd = cursor + 60;
             slots.push({start: minutesToHHMM(attStart), end: minutesToHHMM(attEnd)});
-            // avanzar 60 + 10 minutos (=70) para el siguiente inicio
-            cursor = attEnd + 10;
+            cursor = attEnd;
         }
 
         return slots;
@@ -103,7 +103,7 @@ export default function CalendarioMensualHoras() {
         // Validar que no sea domingo
         const dayOfWeek = fecha.getDay();
         if (dayOfWeek === 0) {
-            toast.error("Las atenciones son de Lunes a Sábado.\nLun-Sáb: 9:00-22:00", {
+            toast.error("Las atenciones son de Lunes a Sábado.\nLun-Vie: 13:00-21:00 | Sáb: 10:00-17:00", {
                 duration: 4000,
                 style: {
                     background: '#FEE2E2',
@@ -460,7 +460,7 @@ export default function CalendarioMensualHoras() {
                         <div className="mt-5">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-sm font-semibold text-slate-800">
-                                    Agenda (09:00–22:00)
+                                    Agenda ({fechaSeleccionada?.getDay() === 6 ? '10:00–16:00' : '13:00–21:00'})
                                 </h3>
                                 <div className="flex items-center gap-3">
                                     <p className="text-xs text-slate-500">Bloques de 60 min</p>
@@ -572,7 +572,7 @@ export default function CalendarioMensualHoras() {
                         Medicina estética regenerativa y no invasiva con atención personalizada.
                     </p>
                     <p className="mt-2 text-[11px] text-slate-400">
-                        Horarios: Lun-Sáb 9:00-22:00 | Dom Cerrado
+                        Horarios: Lun-Vie 13:00-21:00 | Sáb 10:00-16:00 | Dom Cerrado
                     </p>
                 </footer>
             </div>
