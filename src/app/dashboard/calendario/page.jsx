@@ -1,6 +1,6 @@
 "use client"
 
-import {useState, useMemo, useEffect, Suspense} from "react";
+import {useState, useMemo, useEffect, useRef, Suspense} from "react";
 import {useSearchParams} from "next/navigation";
 import {Calendar, dateFnsLocalizer} from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -53,16 +53,20 @@ function Calendario() {
         const style = document.createElement('style');
         style.textContent = `
             .rbc-month-view .rbc-event {
-                min-height: 28px !important; height: auto !important; padding: 6px 8px !important;
+                min-height: 28px !important; height: auto !important; padding: 6px 10px !important;
                 line-height: 1.3 !important; white-space: normal !important; overflow: visible !important; word-break: break-word !important;
+                border-radius: 10px !important;
             }
             .rbc-time-view .rbc-event {
-                min-height: 30px !important; height: auto !important; padding: 6px 8px !important;
+                min-height: 30px !important; height: auto !important; padding: 6px 10px !important;
                 line-height: 1.3 !important; white-space: normal !important; overflow: visible !important; word-break: break-word !important;
+                border-radius: 10px !important;
             }
             .rbc-month-view .rbc-day-slot { min-height: 80px !important; }
             .rbc-row-segment { z-index: 1 !important; }
             .rbc-event-label, .rbc-event-content { white-space: normal !important; overflow: visible !important; word-break: break-word !important; }
+            .rbc-slot-selection { border-radius: 10px !important; background-color: rgba(126, 34, 206, 0.35) !important; border: 1px solid rgba(126, 34, 206, 0.6) !important; }
+            .rbc-day-slot .rbc-event { border-radius: 10px !important; }
         `;
         document.head.appendChild(style);
         return () => { document.head.removeChild(style); };
@@ -84,6 +88,27 @@ function Calendario() {
     const [estadoReserva, setEstadoReserva] = useState("");
     const [id_reserva, setid_reserva] = useState(0);
     const [dataAgenda, setDataAgenda] = useState([]);
+
+    const formRef = useRef(null);
+    const [valorFechaHoraInicio, setValorFechaHoraInicio] = useState(null);
+    const [valorFechaHoraFin, setValorFechaHoraFin] = useState(null);
+
+    // --- Popup rápido estilo Google Calendar ---
+    const popupRef = useRef(null);
+    const [showQuickPopup, setShowQuickPopup] = useState(false);
+    const [quickPopupPos, setQuickPopupPos] = useState({top: 0, left: 0});
+    const [quickNombre, setQuickNombre] = useState("");
+    const [quickApellido, setQuickApellido] = useState("");
+    const [quickRut, setQuickRut] = useState("");
+    const [quickTelefono, setQuickTelefono] = useState("");
+    const [quickEmail, setQuickEmail] = useState("");
+    const [quickFechaInicio, setQuickFechaInicio] = useState("");
+    const [quickHoraInicio, setQuickHoraInicio] = useState("");
+    const [quickFechaFin, setQuickFechaFin] = useState("");
+    const [quickHoraFin, setQuickHoraFin] = useState("");
+    const [guardandoQuick, setGuardandoQuick] = useState(false);
+    const isDraggingPopup = useRef(false);
+    const dragOffset = useRef({x: 0, y: 0});
 
     function formatearFechaLocal(d) {
         const y = d.getFullYear();
@@ -233,7 +258,7 @@ function Calendario() {
         style: {
             display: 'flex', alignItems: 'center', height: 'auto', minHeight: '28px', maxHeight: 'none',
             whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', lineHeight: '1.3',
-            padding: '6px 8px', fontSize: '0.8rem', boxSizing: 'border-box', borderRadius: '6px',
+            padding: '6px 10px', fontSize: '0.8rem', boxSizing: 'border-box', borderRadius: '10px',
             backgroundColor: '#0284c7', color: '#fff', fontWeight: '500', wordBreak: 'break-word',
         },
     });
@@ -298,6 +323,12 @@ function Calendario() {
             setfechaFinalizacion((reserva.fechaFinalizacion ?? "").slice(0, 10));
             setHoraFinalizacion(reserva.horaFinalizacion ?? "");
             setEstadoReserva(reserva.estadoReserva ?? "");
+
+            // Sincronizar los pickers de fecha/hora
+            const loadedStart = new Date(`${(reserva.fechaInicio ?? "").slice(0, 10)}T${reserva.horaInicio ?? "10:00:00"}`);
+            const loadedEnd = new Date(`${(reserva.fechaFinalizacion ?? "").slice(0, 10)}T${reserva.horaFinalizacion ?? "11:00:00"}`);
+            setValorFechaHoraInicio(loadedStart);
+            setValorFechaHoraFin(loadedEnd);
         } catch (error) {
             console.log(error);
             return toast.error("El servidor no responde");
@@ -413,7 +444,116 @@ function Calendario() {
 
     function limpiarData() {
         setNombrePaciente(""); setApellidoPaciente(""); setTelefono(""); setRut(""); setEmail("");
+        setfechaInicio(""); setHoraInicio(""); setfechaFinalizacion(""); setHoraFinalizacion("");
+        setValorFechaHoraInicio(null); setValorFechaHoraFin(null);
+        setid_reserva(0); setEstadoReserva("");
     }
+
+    // --- Funciones del popup rápido ---
+    function cerrarPopup() {
+        setShowQuickPopup(false);
+        setQuickNombre(""); setQuickApellido(""); setQuickRut(""); setQuickTelefono(""); setQuickEmail("");
+        setQuickFechaInicio(""); setQuickHoraInicio(""); setQuickFechaFin(""); setQuickHoraFin("");
+    }
+
+    async function bloquearDesdePopup() {
+        setGuardandoQuick(true);
+        try {
+            await bloquearAgenda(quickFechaInicio, quickHoraInicio, quickFechaFin, quickHoraFin);
+            cerrarPopup();
+        } catch (e) {
+            // bloquearAgenda ya maneja sus propios toasts
+        } finally {
+            setGuardandoQuick(false);
+        }
+    }
+
+    async function guardarDesdePopup() {
+        if (!quickNombre || !quickApellido || !quickRut || !quickTelefono || !quickEmail) {
+            return toast.error("Debe llenar todos los campos");
+        }
+        setGuardandoQuick(true);
+        try {
+            const res = await insertarNuevaReserva(
+                quickNombre, quickApellido, quickRut, quickTelefono, quickEmail,
+                quickFechaInicio, quickHoraInicio, quickFechaFin, quickHoraFin
+            );
+            cerrarPopup();
+        } catch (e) {
+            // insertarNuevaReserva ya maneja sus propios toasts
+        } finally {
+            setGuardandoQuick(false);
+        }
+    }
+
+    function calcularPosicionPopup(slotInfo) {
+        const POPUP_W = 320;
+        const POPUP_H = 420;
+        const GAP = 8;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        let top, left;
+
+        if (slotInfo.bounds) {
+            // Drag selection: posicionar a la derecha del área seleccionada
+            left = slotInfo.bounds.right + GAP;
+            top = slotInfo.bounds.top;
+            // Si se sale por la derecha, poner a la izquierda
+            if (left + POPUP_W > vw - 16) left = slotInfo.bounds.left - POPUP_W - GAP;
+        } else if (slotInfo.box) {
+            // Click: posicionar cerca del cursor
+            left = slotInfo.box.clientX + GAP;
+            top = slotInfo.box.clientY - 40;
+            if (left + POPUP_W > vw - 16) left = slotInfo.box.clientX - POPUP_W - GAP;
+        } else {
+            // Fallback: centrar
+            left = (vw - POPUP_W) / 2;
+            top = (vh - POPUP_H) / 2;
+        }
+
+        // No salirse por abajo
+        if (top + POPUP_H > vh - 16) top = vh - POPUP_H - 16;
+        // No salirse por arriba
+        if (top < 16) top = 16;
+        // No salirse por la izquierda
+        if (left < 16) left = 16;
+
+        return {top, left};
+    }
+
+    // Cerrar popup al hacer clic fuera
+    useEffect(() => {
+        if (!showQuickPopup) return;
+        function handleClickOutside(e) {
+            if (popupRef.current && !popupRef.current.contains(e.target)) {
+                cerrarPopup();
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [showQuickPopup]);
+
+    // Drag del popup
+    useEffect(() => {
+        if (!showQuickPopup) return;
+        function handleMouseMove(e) {
+            if (!isDraggingPopup.current) return;
+            setQuickPopupPos({
+                top: e.clientY - dragOffset.current.y,
+                left: e.clientX - dragOffset.current.x,
+            });
+        }
+        function handleMouseUp() {
+            isDraggingPopup.current = false;
+        }
+        document.addEventListener("mousemove", handleMouseMove);
+        document.addEventListener("mouseup", handleMouseUp);
+        return () => {
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
+        };
+    }, [showQuickPopup]);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50/30">
@@ -434,7 +574,17 @@ function Calendario() {
                 </div>
 
                 {/* Formulario + Fechas */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div ref={formRef} className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+                    {/* Banner de horario seleccionado */}
+                    {valorFechaHoraInicio && fechaInicio && (
+                        <div className="lg:col-span-2 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-2.5 flex items-center justify-between">
+                            <span className="text-sm text-emerald-700">
+                                Horario seleccionado: <strong>{fechaInicio}</strong> de <strong>{horaInicio?.slice(0,5)}</strong> a <strong>{horaFinalizacion?.slice(0,5)}</strong> — Complete los datos del paciente y presione <strong>Agregar</strong>
+                            </span>
+                            <button onClick={() => limpiarData()} className="text-xs text-emerald-600 hover:text-emerald-800 underline ml-3">Cancelar</button>
+                        </div>
+                    )}
 
                     {/* Datos del paciente */}
                     <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
@@ -487,7 +637,7 @@ function Calendario() {
                             </div>
                             <div className="p-5 flex flex-col md:flex-row md:items-center md:gap-4">
                                 <div className="flex-1">
-                                    <ShadcnFechaHora onChange={manejarFechaHoraInicio}/>
+                                    <ShadcnFechaHora onChange={manejarFechaHoraInicio} value={valorFechaHoraInicio}/>
                                 </div>
                                 <div className="mt-3 md:mt-0 bg-slate-50 border border-slate-100 rounded-lg p-3 w-full md:w-48">
                                     <div className="flex items-center justify-between">
@@ -510,7 +660,7 @@ function Calendario() {
                             </div>
                             <div className="p-5 flex flex-col md:flex-row md:items-center md:gap-4">
                                 <div className="flex-1">
-                                    <ShadcnFechaHora onChange={manejarFechaHoraFinalizacion}/>
+                                    <ShadcnFechaHora onChange={manejarFechaHoraFinalizacion} value={valorFechaHoraFin}/>
                                 </div>
                                 <div className="mt-3 md:mt-0 bg-slate-50 border border-slate-100 rounded-lg p-3 w-full md:w-48">
                                     <div className="flex items-center justify-between">
@@ -740,18 +890,170 @@ function Calendario() {
                                 toast.success(`Reserva: Numero # ${event.id_reserva}`);
                             }}
                             onSelectSlot={(slotInfo) => {
-                                const start = slotInfo.start ?? slotInfo;
-                                const end = slotInfo.end ?? slotInfo;
-                                if (isOverlapping(start, end)) { toast.error('No puede seleccionar un horario que ya está ocupado'); return; }
-                                const title = prompt("Título del evento");
-                                if (!title) return;
-                                setEvents((prev) => [...prev, {title, start: slotInfo.start, end: slotInfo.end}]);
+                                const start = slotInfo.start;
+                                const end = slotInfo.end;
+
+                                if (isOverlapping(start, end)) {
+                                    toast.error('No puede seleccionar un horario que ya está ocupado');
+                                    return;
+                                }
+
+                                // En vista mes, start/end son 00:00. Defaultear a 10:00-11:00
+                                let adjustedStart = start;
+                                let adjustedEnd = end;
+                                const isFullDay =
+                                    start.getHours() === 0 && start.getMinutes() === 0 &&
+                                    end.getHours() === 0 && end.getMinutes() === 0;
+                                if (isFullDay) {
+                                    adjustedStart = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 10, 0, 0);
+                                    adjustedEnd = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 11, 0, 0);
+                                }
+
+                                const fi = formatearFechaLocal(adjustedStart);
+                                const hi = adjustedStart.toTimeString().slice(0, 8);
+                                const ff = formatearFechaLocal(adjustedEnd);
+                                const hf = adjustedEnd.toTimeString().slice(0, 8);
+
+                                // Setear formulario principal también
+                                setfechaInicio(fi); setHoraInicio(hi);
+                                setfechaFinalizacion(ff); setHoraFinalizacion(hf);
+                                setValorFechaHoraInicio(new Date(adjustedStart));
+                                setValorFechaHoraFin(new Date(adjustedEnd));
+                                setid_reserva(0); setEstadoReserva("");
+
+                                // Abrir popup rápido
+                                setQuickFechaInicio(fi); setQuickHoraInicio(hi);
+                                setQuickFechaFin(ff); setQuickHoraFin(hf);
+                                setQuickNombre(""); setQuickApellido("");
+                                setQuickRut(""); setQuickTelefono(""); setQuickEmail("");
+                                setQuickPopupPos(calcularPosicionPopup(slotInfo));
+                                setShowQuickPopup(true);
                             }}
                         />
                     </div>
                 </div>
 
             </div>
+
+            {/* Popup rápido de reserva (estilo Google Calendar) */}
+            {showQuickPopup && (
+                <div
+                    ref={popupRef}
+                    className="fixed z-50 bg-white rounded-xl shadow-2xl border border-slate-200 w-80 animate-in fade-in zoom-in-95 duration-150"
+                    style={{top: quickPopupPos.top, left: quickPopupPos.left}}
+                >
+                    {/* Header - arrastrable */}
+                    <div
+                        className="flex items-center justify-between px-4 pt-4 pb-2 cursor-grab active:cursor-grabbing select-none"
+                        onMouseDown={(e) => {
+                            isDraggingPopup.current = true;
+                            dragOffset.current = {
+                                x: e.clientX - quickPopupPos.left,
+                                y: e.clientY - quickPopupPos.top,
+                            };
+                        }}
+                    >
+                        <h3 className="text-sm font-bold text-slate-800">Nueva Reserva</h3>
+                        <button
+                            onClick={cerrarPopup}
+                            className="text-slate-400 hover:text-slate-600 transition-colors rounded-full p-1 hover:bg-slate-100"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    {/* Horario seleccionado */}
+                    <div className="mx-4 mb-3 bg-sky-50 border border-sky-100 rounded-lg px-3 py-2 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-sky-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span className="text-xs font-medium text-sky-700">
+                            {quickFechaInicio} &middot; {quickHoraInicio?.slice(0,5)} - {quickHoraFin?.slice(0,5)}
+                        </span>
+                    </div>
+
+                    {/* Campos */}
+                    <div className="px-4 space-y-2">
+                        <input
+                            type="text"
+                            placeholder="Nombre *"
+                            value={quickNombre}
+                            onChange={(e) => setQuickNombre(e.target.value)}
+                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                            autoFocus
+                        />
+                        <input
+                            type="text"
+                            placeholder="Apellido *"
+                            value={quickApellido}
+                            onChange={(e) => setQuickApellido(e.target.value)}
+                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                        />
+                        <input
+                            type="text"
+                            placeholder="RUT (sin puntos ni guion) *"
+                            value={quickRut}
+                            onChange={(e) => setQuickRut(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))}
+                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                        />
+                        <input
+                            type="text"
+                            placeholder="Telefono *"
+                            value={quickTelefono}
+                            onChange={(e) => setQuickTelefono(e.target.value)}
+                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                        />
+                        <input
+                            type="email"
+                            placeholder="Correo *"
+                            value={quickEmail}
+                            onChange={(e) => setQuickEmail(e.target.value)}
+                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                        />
+                    </div>
+
+                    {/* Botones */}
+                    <div className="flex flex-col gap-2 px-4 pt-3 pb-4">
+                        <div className="flex gap-2">
+                            <button
+                                onClick={guardarDesdePopup}
+                                disabled={guardandoQuick}
+                                className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-sky-600 to-cyan-500 rounded-lg hover:from-sky-700 hover:to-cyan-600 transition-all duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {guardandoQuick ? (
+                                    <svg className="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+                                    </svg>
+                                ) : (
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                )}
+                                {guardandoQuick ? "Guardando..." : "Guardar"}
+                            </button>
+                            <button
+                                onClick={cerrarPopup}
+                                className="px-4 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors duration-150"
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                        <button
+                            onClick={bloquearDesdePopup}
+                            disabled={guardandoQuick}
+                            className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                            </svg>
+                            Bloquear horario
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

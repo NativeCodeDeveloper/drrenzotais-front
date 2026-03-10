@@ -12,12 +12,31 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 
-export default function ShadcnFechaHora({onChange}) {
+export default function ShadcnFechaHora({onChange, value}) {
     const [open, setOpen] = React.useState(false)
     const [date, setDate] = React.useState(undefined)
     const [hour, setHour] = React.useState("10")
     const [minute, setMinute] = React.useState("30")
     const time = `${hour.padStart(2, "0")}:${minute.padStart(2, "0")}:00`
+
+    // Sincronizar estado interno cuando se recibe un value externo
+    React.useEffect(() => {
+        if (value instanceof Date && !isNaN(value.getTime())) {
+            const newHour = String(value.getHours());
+            const rawMinute = value.getMinutes();
+            const snapped = Math.round(rawMinute / 5) * 5;
+            const newMinute = String(snapped >= 60 ? 55 : snapped);
+
+            setDate(prev => {
+                if (prev && prev.getFullYear() === value.getFullYear() &&
+                    prev.getMonth() === value.getMonth() &&
+                    prev.getDate() === value.getDate()) return prev;
+                return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+            });
+            setHour(prev => prev === newHour ? prev : newHour);
+            setMinute(prev => prev === newMinute ? prev : newMinute);
+        }
+    }, [value]);
 
     const dateTime = React.useMemo(() => {
         if (!date) return null
