@@ -1,4 +1,5 @@
 // app/dashboard/layout.jsx
+import { ClerkProvider } from "@clerk/nextjs";
 import Link from "next/link";
 import MobileNav from "./MobileNav";
 import SignOutButton from "./SignOutButton";
@@ -10,6 +11,7 @@ export const metadata = {
 
 export default function DashboardLayout({ children }) {
     return (
+        <ClerkProvider>
         <div className="h-screen w-full overflow-hidden bg-white">
             <div className="flex h-full w-full">
                 {/* Sidebar */}
@@ -263,5 +265,6 @@ export default function DashboardLayout({ children }) {
                 </div>
             </div>
         </div>
+        </ClerkProvider>
     );
 }
