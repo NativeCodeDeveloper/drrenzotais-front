@@ -211,6 +211,15 @@ export default function DashboardLayout({ children }) {
                             <div className="px-2.5 text-[9px] font-medium tracking-[0.04em] text-white/25">Atajos</div>
                             <div className="mt-1.5 space-y-px">
                                 <Link
+                                    href="/dashboard/configuracion"
+                                    className="group/link flex items-center gap-2 rounded-md px-2.5 py-[5px] text-[11px] font-medium text-white/50 hover:text-white/80 hover:bg-white/[0.05] transition-all duration-150"
+                                >
+                                    <svg className="h-3 w-3 text-white/25 group-hover/link:text-cyan-400 transition-colors duration-150" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 2a6 6 0 00-6 6c0 1.887-.454 3.665-1.257 5.234a.75.75 0 00.515 1.076 32.91 32.91 0 003.256.508 3.5 3.5 0 006.972 0 32.903 32.903 0 003.256-.508.75.75 0 00.515-1.076A11.448 11.448 0 0116 8a6 6 0 00-6-6zm0 2a1 1 0 011 1v3a1 1 0 01-2 0V5a1 1 0 011-1z" clipRule="evenodd" />
+                                    </svg>
+                                    Configuracion
+                                </Link>
+                                <Link
                                     href="/"
                                     className="group/link flex items-center gap-2 rounded-md px-2.5 py-[5px] text-[11px] font-medium text-white/50 hover:text-white/80 hover:bg-white/[0.05] transition-all duration-150"
                                 >
