@@ -1,6 +1,8 @@
 
 
 
+
+/*
 // frontend/src/middleware.ts
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -10,110 +12,65 @@ return NextResponse.next()
 }
 
 // (Opcional) Indica en qué rutas se ejecuta
-// (Opcional) Indica en qué rutas se ejecuta
-// (Opcional) Indica en qué rutas se ejecuta
 export const config = {
 matcher: ['/dashboard/:path*'], // o simplemente [] si quieres que no aplique a ninguna
 }
 
 
 
-
-/*
-
+*/
 
 
-// TypeScript
-// archivo: `frontend/src/middleware.ts`
-import { clerkMiddleware, clerkClient, createRouteMatcher } from '@clerk/nextjs/server'
-import { NextResponse, type NextRequest } from 'next/server'
 
-// Matcher que detecta cualquier ruta dentro de /dashboard (incluye layout y subrutas)
-// Usamos la sintaxis Next.js '/dashboard/:path*' que coincide con /dashboard y todas sus subrutas
-const isProtectedRoute = createRouteMatcher(['/dashboard/:path*'])
 
-const ALLOWED_EMAILS = new Set([
-    'siluetachicestudio@gmail.com',
-    'soporte@nativecode.cl',
+
+
+
+
+
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
+
+const isDashboard = createRouteMatcher(['/dashboard(.*)'])
+
+// Rutas permitidas para recepcionista: inicio + módulo calendario completo
+const isRecepcionistaAllowed = createRouteMatcher([
+    '/dashboard',
+    '/dashboard/no-access',
+    '/dashboard/calendarioGeneral',
+    '/dashboard/calendario',
+    '/dashboard/agendaCitas',
+    '/dashboard/bloqueosAgenda',
+    '/dashboard/AgendaDetalle/(.*)',
+    '/dashboard/GestionPaciente',
+    '/dashboard/paciente/(.*)',
 ])
 
-export default clerkMiddleware(async (auth, req: NextRequest) => {
-    const pathname = req.nextUrl.pathname
+export default clerkMiddleware(async (auth, req) => {
+    if (!isDashboard(req)) return NextResponse.next()
 
-    // LOG temporales para depuración (quitar en producción)
-    try {
-        // No usar JSON.stringify en Request circular
-        console.log('[middleware] method=', req.method, 'pathname=', pathname)
-    } catch (e) {
-        // ignore
-    }
+    const { userId, sessionClaims } = await auth()
 
-    // Evitar procesar rutas públicas que podrían crear bucles
-    // Nota: removemos '/sign-up' para que no sea considerada pública y podamos
-    // interceptar intentos de registro y redirigirlos a '/sign-in'.
-    const PUBLIC_ROUTES = new Set(['/no-access', '/sign-in', '/sign-out', '/'])
-    if (PUBLIC_ROUTES.has(pathname)) {
-        return NextResponse.next()
-    }
-
-    // Si intentan acceder a /sign-up (registro), forzamos redirección a /sign-in
-    // para impedir el registro desde la UI pública.
-    if (pathname === '/sign-up' || pathname.startsWith('/sign-up/')) {
-        const signinUrl = new URL('/sign-in', req.url)
-        signinUrl.searchParams.set('redirect_url', pathname)
-        return NextResponse.redirect(signinUrl)
-    }
-
-    // Si no es una ruta protegida, seguir
-    if (!isProtectedRoute(req)) {
-        return NextResponse.next()
-    }
-
-    // Estado de autenticación actual
-    const { userId } = await auth()
-
-    // 1) Si NO está autenticado → llevar a /sign-in (no a /sign-up)
+    // No autenticado → sign-in
     if (!userId) {
-        const signinUrl = new URL('/sign-in', req.url)
-        // opcional: redirigir de vuelta después de completar el sign-in
-        signinUrl.searchParams.set('redirect_url', pathname)
-        return NextResponse.redirect(signinUrl)
+        return NextResponse.redirect(new URL('/sign-in', req.url))
     }
 
-    try {
-        let client: any = clerkClient as any
-        if (typeof clerkClient === 'function') {
-            client = await (clerkClient as any)()
-        }
+    // Leer rol desde publicMetadata (configurado en Clerk Dashboard)
+    const role = (sessionClaims?.metadata as { role?: string } | undefined)?.role
 
-        const user = await client.users.getUser(userId)
-        const userEmails = (user.emailAddresses || []).map((addr: any) => (addr.emailAddress || '').toLowerCase())
-        const isAllowed = userEmails.some((email: string) => ALLOWED_EMAILS.has(email))
-
-        if (!isAllowed) {
-            const url = new URL('/no-access', req.url)
-            return NextResponse.redirect(url)
-        }
-
-        return NextResponse.next()
-    } catch (err) {
-        const url = new URL('/no-access', req.url)
-        return NextResponse.redirect(url)
+    // Recepcionista → solo accede a inicio + calendario, el resto → no-access
+    if (role === 'recepcionista' && !isRecepcionistaAllowed(req)) {
+        return NextResponse.redirect(new URL('/dashboard/no-access', req.url))
     }
 
+    return NextResponse.next()
 })
 
 export const config = {
-    matcher: [
-        // Ejecutar middleware para las rutas del dashboard y sus subrutas
-        '/dashboard/:path*',
-        // Incluir /sign-up para interceptar accesos a la página de registro
-        '/sign-up',
-        '/sign-up/:path*'
-    ],
+    matcher: ['/dashboard/:path*'],
 }
 
 
 
-   */
 
