@@ -1,6 +1,7 @@
 // app/dashboard/layout.jsx
 import Link from "next/link";
 import MobileNav from "./MobileNav";
+import SignOutButton from "./SignOutButton";
 
 export const metadata = {
     title: "Dashboard",
@@ -229,6 +230,7 @@ export default function DashboardLayout({ children }) {
                                     </svg>
                                     Volver al sitio
                                 </Link>
+                                <SignOutButton />
                             </div>
                         </div>
                     </nav>

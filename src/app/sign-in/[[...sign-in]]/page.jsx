@@ -1,19 +1,26 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useSignIn } from "@clerk/nextjs";
+import { useSignIn, useAuth } from "@clerk/nextjs";
 import OrbBackground from "@/Componentes/OrbBackground";
 
 export default function Page() {
   const router = useRouter();
   const { isLoaded, signIn, setActive } = useSignIn();
+  const { isSignedIn } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  if (!isLoaded) {
+  useEffect(() => {
+    if (isSignedIn) {
+      router.replace("/dashboard");
+    }
+  }, [isSignedIn, router]);
+
+  if (!isLoaded || isSignedIn) {
     return (
       <main className="min-h-screen grid place-items-center bg-black">
         <div className="animate-pulse text-white/40 text-sm font-[family-name:var(--font-inter)]">Cargando...</div>
