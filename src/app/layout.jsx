@@ -3,6 +3,7 @@ import { AnimatedLayout } from "@/Componentes/AnimatedLayout";
 import AgendaProvider from "@/ContextosGlobales/AgendaContext";
 import CarritoProvider from "@/ContextosGlobales/CarritoContext";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
+import Script from "next/script";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -76,6 +77,20 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="es" className={`${manrope.variable} ${cormorant.variable}`}>
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18165859241"
+          strategy="afterInteractive"
+        />
+        <Script id="google-ads-gtag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-18165859241');
+          `}
+        </Script>
+      </head>
       <body className="min-h-screen bg-white">
         <AnimatedLayout>
           <AgendaProvider>
